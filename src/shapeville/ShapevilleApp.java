@@ -34,6 +34,7 @@ public class ShapevilleApp extends JFrame {
     private AnglePanel anglePanel;
     private AreaPanel areaPanel;
     private CirclePanel circlePanel;
+    private JPanel sectorPanel; // Bonus2 扇形练习面板
     
     public ShapevilleApp() {
         setTitle("Shapeville - Learning Geometry");
@@ -160,6 +161,10 @@ public class ShapevilleApp extends JFrame {
     
     // Methods to navigate between screens
     public void returnToHome() {
+        // 检查 Bonus2 是否完成
+        if (sectorPanel != null && ((shapeville.bonus2.SectorPanel)sectorPanel).isAllSectorsCompleted()) {
+            updateProgress(100/6); // Bonus2 完成时更新主进度条
+        }
         cardLayout.show(contentPanel, HOME_SCREEN);
     }
     
@@ -264,12 +269,17 @@ public class ShapevilleApp extends JFrame {
     
     // Bonus 2: Sector Area and Arc Length Calculation
     public void startBonus2() {
-        // This will be implemented in the future
-        JOptionPane.showMessageDialog(this, 
-                "Bonus 2: Sector & Arc Calculations will be implemented in a future update.", 
-                "Coming Soon", 
-                JOptionPane.INFORMATION_MESSAGE);
-        returnToHome();
+        // 初始化SectorPanel，如果未创建则新建
+        if (sectorPanel == null) {
+            sectorPanel = new shapeville.bonus2.SectorPanel(this);
+            contentPanel.add(sectorPanel, "SECTOR_SCREEN");
+        }
+        // 检查是否已完成，如果已完成则保持进度
+        if (((shapeville.bonus2.SectorPanel)sectorPanel).isAllSectorsCompleted()) {
+            updateProgress(100/6);
+        }
+        // 显示SectorPanel
+        cardLayout.show(contentPanel, "SECTOR_SCREEN");
     }
     
     // Methods to update UI elements
