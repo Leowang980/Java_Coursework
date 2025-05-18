@@ -5,7 +5,7 @@ import shapeville.task1.Shape3DPanel;
 import shapeville.task2.AnglePanel;
 import shapeville.task3.AreaPanel;
 import shapeville.task4.CirclePanel;
-
+import shapeville.bonus1.CompoundPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -35,7 +35,7 @@ public class ShapevilleApp extends JFrame {
     private AreaPanel areaPanel;
     private CirclePanel circlePanel;
     private JPanel sectorPanel; // Bonus2 扇形练习面板
-    
+    private JPanel compoundPanel; // Bonus1 扇形练习面板
     public ShapevilleApp() {
         setTitle("Shapeville - Learning Geometry");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -168,6 +168,13 @@ public class ShapevilleApp extends JFrame {
         cardLayout.show(contentPanel, HOME_SCREEN);
     }
     
+    // Bonus1 返回主页
+    public void returnToHomeBonus1() {
+        if (compoundPanel != null && ((shapeville.bonus1.CompoundPanel)compoundPanel).isAllCompoundsCompleted()) {
+            updateProgress(100/6); // Bonus1 完成时更新主进度条
+        }
+        cardLayout.show(contentPanel, HOME_SCREEN);
+    }
     private void endSession() {
         JOptionPane.showMessageDialog(this, 
                 "You have achieved " + totalScore + " points in this session. Goodbye!", 
@@ -256,15 +263,20 @@ public class ShapevilleApp extends JFrame {
         // Show the circle screen
         cardLayout.show(contentPanel, CIRCLE_SCREEN);
     }
-    
+
     // Bonus 1: Compound Shapes Area Calculation
     public void startBonus1() {
-        // This will be implemented in the future
-        JOptionPane.showMessageDialog(this, 
-                "Bonus 1: Compound Shapes will be implemented in a future update.", 
-                "Coming Soon", 
-                JOptionPane.INFORMATION_MESSAGE);
-        returnToHome();
+        // 初始化CompoundPanel，如果未创建则新建
+        if (compoundPanel == null) {
+            compoundPanel = new shapeville.bonus1.CompoundPanel(this);
+            contentPanel.add(compoundPanel, "COMPOUND_SCREEN");
+        }
+        // 检查是否已完成，如果已完成则保持进度
+        if (((shapeville.bonus1.CompoundPanel)compoundPanel).isAllCompoundsCompleted()) {
+            updateProgress(100/6);
+        }
+        // 显示CompoundPanel
+        cardLayout.show(contentPanel, "COMPOUND_SCREEN");
     }
     
     // Bonus 2: Sector Area and Arc Length Calculation
