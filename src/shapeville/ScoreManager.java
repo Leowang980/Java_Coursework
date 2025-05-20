@@ -16,7 +16,10 @@ public class ScoreManager {
     
     // Maximum number of attempts allowed
     public static final int MAX_ATTEMPTS = 3;
-    
+    private static int score = 0;// 分数存储
+    // 新增全局进度存储
+    private static int totalProgress = 0;
+    private static final int TOTAL_TASKS = 6;//总任务数
     /**
      * Calculate score based on level and number of attempts
      * @param isAdvanced true if advanced level, false if basic level
@@ -61,7 +64,14 @@ public class ScoreManager {
             return "Keep practicing!";
         }
     }
-    
+    public static void addTaskProgress() {
+        int increment = 100 / TOTAL_TASKS;
+        totalProgress = Math.min(totalProgress + increment, 100);
+    }
+
+    public static int getGlobalProgress() {
+        return totalProgress;
+    }
     /**
      * Calculate progress percentage based on completed items and total items
      * @param completed number of completed items
@@ -73,5 +83,12 @@ public class ScoreManager {
             return 0;
         }
         return (completed * 100) / total;
+    }
+    public static int getScore() {
+        return score;
+    }
+
+    public static void addScore(int points) {
+        score += points;
     }
 } 

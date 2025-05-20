@@ -316,4 +316,7 @@ public class ShapevilleApp extends JFrame {
             app.setVisible(true);
         });
     }
+    public int getCurrentScore() {
+        return ScoreManager.getScore();
+    }
 } 
