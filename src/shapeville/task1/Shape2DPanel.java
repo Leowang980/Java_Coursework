@@ -22,6 +22,9 @@ public class Shape2DPanel extends JPanel {
     private JLabel feedbackLabel;
     private JLabel attemptsLabel;
     private JLabel progressLabel;
+    private JLabel moduleScoreLabel;
+    private JProgressBar moduleProgressBar;
+    private int moduleScore = 0;
 
     private List<Shape2D> shapes;
     private Shape2D currentShape;
@@ -103,6 +106,13 @@ public class Shape2DPanel extends JPanel {
         shapeImageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         centerPanel.add(shapeImageLabel, BorderLayout.CENTER);
 
+        // 新增：模块进度条
+        moduleProgressBar = new JProgressBar(0, shapes.size());
+        moduleProgressBar.setValue(0);
+        moduleProgressBar.setStringPainted(true);
+        moduleProgressBar.setString("0/" + shapes.size());
+        centerPanel.add(moduleProgressBar, BorderLayout.SOUTH);
+
         panel.add(centerPanel, BorderLayout.CENTER);
 
         // Bottom panel with input field and submit button
@@ -156,11 +166,18 @@ public class Shape2DPanel extends JPanel {
         progressLabel = new JLabel("Progress: 0/" + shapes.size());
         progressLabel.setFont(new Font("Arial", Font.PLAIN, 14));
 
+        // 新增：模块分数显示
+        moduleScoreLabel = new JLabel("Module Score: 0");
+        moduleScoreLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        moduleScoreLabel.setForeground(new Color(0, 102, 204));
+
         feedbackPanel.add(feedbackLabel);
         feedbackPanel.add(Box.createHorizontalStrut(20));
         feedbackPanel.add(attemptsLabel);
         feedbackPanel.add(Box.createHorizontalStrut(20));
         feedbackPanel.add(progressLabel);
+        feedbackPanel.add(Box.createHorizontalStrut(20));
+        feedbackPanel.add(moduleScoreLabel);
 
         bottomPanel.add(feedbackPanel, BorderLayout.CENTER);
 
@@ -198,7 +215,8 @@ public class Shape2DPanel extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         panel.setBackground(new Color(240, 255, 240)); // Light green background
 
-        JLabel completionLabel = new JLabel("Great job! You've completed the 2D Shapes Identification task!");
+        // 新增：显示本模块得分
+        JLabel completionLabel = new JLabel("Great job! You've completed the 2D Shapes Identification task!\nModule Score: " + moduleScore);
         completionLabel.setFont(new Font("Arial", Font.BOLD, 18));
         completionLabel.setHorizontalAlignment(JLabel.CENTER);
 
@@ -209,6 +227,8 @@ public class Shape2DPanel extends JPanel {
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // 完成模块时，主进度条增加
+                mainApp.updateProgress(100/6);
                 mainApp.returnToHome();
             }
         });
@@ -220,6 +240,8 @@ public class Shape2DPanel extends JPanel {
         goTo3DButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // 完成模块时，主进度条增加
+                mainApp.updateProgress(100/6);
                 mainApp.startTask1_3D();
             }
         });
@@ -247,6 +269,8 @@ public class Shape2DPanel extends JPanel {
 
         // Check if we've gone through all shapes
         if (currentShapeIndex >= shapes.size()) {
+            // 2D模块完成时立即加进度
+            mainApp.addTask1ProgressPart(0.5);
             cardLayout.show(contentPanel, "COMPLETION");
             return;
         }
@@ -268,10 +292,11 @@ public class Shape2DPanel extends JPanel {
 
         // Update progress
         progressLabel.setText("Progress: " + totalCompleted + "/" + shapes.size());
-
-        // Update progress bar in main app
-        int progress = ScoreManager.calculateProgress(totalCompleted, shapes.size());
-        mainApp.updateProgress(progress);
+        // 更新模块进度条
+        moduleProgressBar.setValue(totalCompleted);
+        moduleProgressBar.setString(totalCompleted + "/" + shapes.size());
+        // 更新模块分数显示
+        moduleScoreLabel.setText("Module Score: " + moduleScore);
     }
 
     private void checkAnswer() {
@@ -296,6 +321,9 @@ public class Shape2DPanel extends JPanel {
 
             // Update score in main app
             mainApp.updateScore(score);
+            // 新增：更新模块分数
+            moduleScore += score;
+            moduleScoreLabel.setText("Module Score: " + moduleScore);
 
             // Disable input until next shape
             answerField.setEnabled(false);

@@ -297,6 +297,7 @@ public class AnglePanel extends JPanel {
         panel.add(completionLabel, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
+        mainApp.addTask2Progress();
         return panel;
     }
 

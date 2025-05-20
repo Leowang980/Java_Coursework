@@ -286,6 +286,8 @@ public class AreaPanel extends JPanel {
         panel.add(completionLabel, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
+        // 新增：全部完成时加主进度
+        mainApp.addTask3Progress();
         return panel;
     }
 

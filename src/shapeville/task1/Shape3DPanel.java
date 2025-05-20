@@ -22,6 +22,9 @@ public class Shape3DPanel extends JPanel {
     private JLabel feedbackLabel;
     private JLabel attemptsLabel;
     private JLabel progressLabel;
+    private JLabel moduleScoreLabel;
+    private JProgressBar moduleProgressBar;
+    private int moduleScore = 0;
 
     private List<Shape3D> shapes;
     private Shape3D currentShape;
@@ -100,6 +103,13 @@ public class Shape3DPanel extends JPanel {
         shapeImageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         centerPanel.add(shapeImageLabel, BorderLayout.CENTER);
 
+        // 新增：模块进度条
+        moduleProgressBar = new JProgressBar(0, shapes.size());
+        moduleProgressBar.setValue(0);
+        moduleProgressBar.setStringPainted(true);
+        moduleProgressBar.setString("0/" + shapes.size());
+        centerPanel.add(moduleProgressBar, BorderLayout.SOUTH);
+
         panel.add(centerPanel, BorderLayout.CENTER);
 
         // Bottom panel with input field and submit button
@@ -153,11 +163,18 @@ public class Shape3DPanel extends JPanel {
         progressLabel = new JLabel("Progress: 0/" + shapes.size());
         progressLabel.setFont(new Font("Arial", Font.PLAIN, 14));
 
+        // 新增：模块分数显示
+        moduleScoreLabel = new JLabel("Module Score: 0");
+        moduleScoreLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        moduleScoreLabel.setForeground(new Color(0, 102, 204));
+
         feedbackPanel.add(feedbackLabel);
         feedbackPanel.add(Box.createHorizontalStrut(20));
         feedbackPanel.add(attemptsLabel);
         feedbackPanel.add(Box.createHorizontalStrut(20));
         feedbackPanel.add(progressLabel);
+        feedbackPanel.add(Box.createHorizontalStrut(20));
+        feedbackPanel.add(moduleScoreLabel);
 
         bottomPanel.add(feedbackPanel, BorderLayout.CENTER);
 
@@ -193,7 +210,8 @@ public class Shape3DPanel extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         panel.setBackground(new Color(240, 255, 240)); // Light green background
 
-        JLabel completionLabel = new JLabel("Congratulations! You've completed the 3D Shapes Identification task!");
+        // 新增：显示本模块得分
+        JLabel completionLabel = new JLabel("Congratulations! You've completed the 3D Shapes Identification task!\nModule Score: " + moduleScore);
         completionLabel.setFont(new Font("Arial", Font.BOLD, 18));
         completionLabel.setHorizontalAlignment(JLabel.CENTER);
 
@@ -242,6 +260,8 @@ public class Shape3DPanel extends JPanel {
 
         // Check if we've gone through all shapes
         if (currentShapeIndex >= shapes.size()) {
+            // 只在全部完成时加分
+            mainApp.addTask1Progress3DPart();
             cardLayout.show(contentPanel, "COMPLETION");
             return;
         }
@@ -266,11 +286,11 @@ public class Shape3DPanel extends JPanel {
 
         // Update progress
         progressLabel.setText("Progress: " + totalCompleted + "/" + shapes.size());
-
-        // Update progress bar in main app
-        int progress = ScoreManager.calculateProgress(totalCompleted, shapes.size());
-        mainApp.updateProgress(progress);
-
+        // 更新模块进度条
+        moduleProgressBar.setValue(totalCompleted);
+        moduleProgressBar.setString(totalCompleted + "/" + shapes.size());
+        // 更新模块分数显示
+        moduleScoreLabel.setText("Module Score: " + moduleScore);
         // Enable input fields
         answerField.setEnabled(true);
         submitButton.setEnabled(true);
@@ -298,6 +318,9 @@ public class Shape3DPanel extends JPanel {
 
             // Update score in main app
             mainApp.updateScore(score);
+            // 新增：更新模块分数
+            moduleScore += score;
+            moduleScoreLabel.setText("Module Score: " + moduleScore);
 
             // Disable input fields
             answerField.setEnabled(false);

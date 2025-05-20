@@ -36,6 +36,18 @@ public class ShapevilleApp extends JFrame {
     private CirclePanel circlePanel;
     private JPanel sectorPanel; // Bonus2 扇形练习面板
     private JPanel compoundPanel; // Bonus1 扇形练习面板
+    
+    // Task 1 2D/3D完成标志
+    private boolean task1_2dCompleted = false;
+    private boolean task1_3dCompleted = false;
+    // 新增：Task2、3、4、Bonus1、Bonus2完成标志
+    private boolean task2Completed = false;
+    private boolean task3Completed = false;
+    private boolean task4Completed = false;
+    private boolean bonus1Completed = false;
+    private boolean bonus2Completed = false;
+    private int totalProgress = 0; // 记录总进度百分比
+    
     public ShapevilleApp() {
         setTitle("Shapeville - Learning Geometry");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -197,10 +209,6 @@ public class ShapevilleApp extends JFrame {
             shape2DPanel = new Shape2DPanel(this);
             contentPanel.add(shape2DPanel, SHAPE_2D_SCREEN);
         }
-        
-        // Reset progress bar
-        updateProgress(0);
-        
         // Show the 2D shapes screen
         cardLayout.show(contentPanel, SHAPE_2D_SCREEN);
     }
@@ -211,10 +219,6 @@ public class ShapevilleApp extends JFrame {
             shape3DPanel = new Shape3DPanel(this);
             contentPanel.add(shape3DPanel, SHAPE_3D_SCREEN);
         }
-        
-        // Reset progress bar
-        updateProgress(0);
-        
         // Show the 3D shapes screen
         cardLayout.show(contentPanel, SHAPE_3D_SCREEN);
     }
@@ -226,9 +230,6 @@ public class ShapevilleApp extends JFrame {
             anglePanel = new AnglePanel(this);
             contentPanel.add(anglePanel, ANGLE_SCREEN);
         }
-        
-        // Reset progress bar
-        updateProgress(0);
         
         // Show the angle screen
         cardLayout.show(contentPanel, ANGLE_SCREEN);
@@ -242,9 +243,6 @@ public class ShapevilleApp extends JFrame {
             contentPanel.add(areaPanel, AREA_SCREEN);
         }
         
-        // Reset progress bar
-        updateProgress(0);
-        
         // Show the area screen
         cardLayout.show(contentPanel, AREA_SCREEN);
     }
@@ -257,9 +255,6 @@ public class ShapevilleApp extends JFrame {
             contentPanel.add(circlePanel, CIRCLE_SCREEN);
         }
         
-        // Reset progress bar
-        updateProgress(0);
-        
         // Show the circle screen
         cardLayout.show(contentPanel, CIRCLE_SCREEN);
     }
@@ -271,10 +266,6 @@ public class ShapevilleApp extends JFrame {
             compoundPanel = new shapeville.bonus1.CompoundPanel(this);
             contentPanel.add(compoundPanel, "COMPOUND_SCREEN");
         }
-        // 检查是否已完成，如果已完成则保持进度
-        if (((shapeville.bonus1.CompoundPanel)compoundPanel).isAllCompoundsCompleted()) {
-            updateProgress(100/6);
-        }
         // 显示CompoundPanel
         cardLayout.show(contentPanel, "COMPOUND_SCREEN");
     }
@@ -285,10 +276,6 @@ public class ShapevilleApp extends JFrame {
         if (sectorPanel == null) {
             sectorPanel = new shapeville.bonus2.SectorPanel(this);
             contentPanel.add(sectorPanel, "SECTOR_SCREEN");
-        }
-        // 检查是否已完成，如果已完成则保持进度
-        if (((shapeville.bonus2.SectorPanel)sectorPanel).isAllSectorsCompleted()) {
-            updateProgress(100/6);
         }
         // 显示SectorPanel
         cardLayout.show(contentPanel, "SECTOR_SCREEN");
@@ -319,4 +306,82 @@ public class ShapevilleApp extends JFrame {
     public int getCurrentScore() {
         return ScoreManager.getScore();
     }
+    
+    /**
+     * Task1子模块完成时调用，part=0.5表示2D或3D各占一半
+     */
+    public void addTask1ProgressPart(double part) {
+        int increment = (int)Math.round(100.0 / 6 * part); // 1/12=8.33...%
+        if (part == 0.5) {
+            if (!task1_2dCompleted) {
+                totalProgress += increment;
+                task1_2dCompleted = true;
+                progressBar.setValue(totalProgress);
+            }
+        } else if (part == 1.5) { // 备用：全部完成
+            if (!task1_2dCompleted || !task1_3dCompleted) {
+                totalProgress += increment * 2;
+                task1_2dCompleted = true;
+                task1_3dCompleted = true;
+                progressBar.setValue(totalProgress);
+            }
+        }
+    }
+    public void addTask1Progress3DPart() {
+        int increment = (int)Math.round(100.0 / 6 * 0.5);
+        if (!task1_3dCompleted) {
+            totalProgress += increment;
+            task1_3dCompleted = true;
+            progressBar.setValue(totalProgress);
+        }
+    }
+    public boolean isTask1_2dCompleted() { return task1_2dCompleted; }
+    public boolean isTask1_3dCompleted() { return task1_3dCompleted; }
+    
+    // 统一进度加分方法
+    public void addTask2Progress() {
+        int increment = 100 / 6;
+        if (!task2Completed) {
+            totalProgress += increment;
+            task2Completed = true;
+            progressBar.setValue(totalProgress);
+        }
+    }
+    public void addTask3Progress() {
+        int increment = 100 / 6;
+        if (!task3Completed) {
+            totalProgress += increment;
+            task3Completed = true;
+            progressBar.setValue(totalProgress);
+        }
+    }
+    public void addTask4Progress() {
+        int increment = 100 / 6;
+        if (!task4Completed) {
+            totalProgress += increment;
+            task4Completed = true;
+            progressBar.setValue(totalProgress);
+        }
+    }
+    public void addBonus1Progress() {
+        int increment = 100 / 6;
+        if (!bonus1Completed) {
+            totalProgress += increment;
+            bonus1Completed = true;
+            progressBar.setValue(totalProgress);
+        }
+    }
+    public void addBonus2Progress() {
+        int increment = 100 / 6;
+        if (!bonus2Completed) {
+            totalProgress += increment;
+            bonus2Completed = true;
+            progressBar.setValue(totalProgress);
+        }
+    }
+    public boolean isTask2Completed() { return task2Completed; }
+    public boolean isTask3Completed() { return task3Completed; }
+    public boolean isTask4Completed() { return task4Completed; }
+    public boolean isBonus1Completed() { return bonus1Completed; }
+    public boolean isBonus2Completed() { return bonus2Completed; }
 } 
