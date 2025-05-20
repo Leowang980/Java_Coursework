@@ -61,12 +61,12 @@ public class CompoundPanel extends JPanel {
     // 创建8个扇形数据
     private List<CompoundData> createCompounds() {
         List<CompoundData> list = new ArrayList<>();
-        list.add(new CompoundData("../sourses/Compound1.jpg", "cm", 310.0));
-        list.add(new CompoundData("../sourses/Compound2.jpg", "cm", 598.0));
-        list.add(new CompoundData("../sourses/Compound3.jpg", "m", 288.0));
-        list.add(new CompoundData("../sourses/Compound4.jpg", "m", 18.0));
-        list.add(new CompoundData("../sourses/Compound5.jpg", "m", 3456.0));
-        list.add(new CompoundData("../sourses/Compound6.jpg", "m", 174.0));
+        list.add(new CompoundData("./sourses/Compound1.jpg", "cm", 310.0));
+        list.add(new CompoundData("./sourses/Compound2.jpg", "cm", 598.0));
+        list.add(new CompoundData("./sourses/Compound3.jpg", "m", 288.0));
+        list.add(new CompoundData("./sourses/Compound4.jpg", "m", 18.0));
+        list.add(new CompoundData("./sourses/Compound5.jpg", "m", 3456.0));
+        list.add(new CompoundData("./sourses/Compound6.jpg", "m", 174.0));
         return list;
     }
 
