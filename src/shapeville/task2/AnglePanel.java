@@ -109,7 +109,7 @@ public class AnglePanel extends JPanel {
         submitAngleButton = new JButton("Submit Angle");
         submitAngleButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitAngleButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
-        submitAngleButton.setForeground(Color.WHITE);
+        submitAngleButton.setForeground(Color.BLACK);
         submitAngleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -148,7 +148,7 @@ public class AnglePanel extends JPanel {
         submitAnswerButton = new JButton("Submit");
         submitAnswerButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitAnswerButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
-        submitAnswerButton.setForeground(Color.WHITE);
+        submitAnswerButton.setForeground(Color.BLACK);
         submitAnswerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -198,7 +198,7 @@ public class AnglePanel extends JPanel {
         JButton homeButton = new JButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
         homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.WHITE);
+        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -270,7 +270,7 @@ public class AnglePanel extends JPanel {
         JButton homeButton = new JButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
         homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.WHITE);
+        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -281,7 +281,7 @@ public class AnglePanel extends JPanel {
         JButton nextTaskButton = new JButton("Go to Task 3: Area Calculation");
         nextTaskButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextTaskButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextTaskButton.setForeground(Color.WHITE);
+        nextTaskButton.setForeground(Color.BLACK);
         nextTaskButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -297,7 +297,7 @@ public class AnglePanel extends JPanel {
         panel.add(completionLabel, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
-        mainApp.addTask2Progress();
+        //mainApp.addTask2Progress();
         return panel;
     }
 
@@ -371,6 +371,7 @@ public class AnglePanel extends JPanel {
 
             if (identifiedAngleTypes.size() == 4) {
                 cardLayout.show(contentPanel, "COMPLETION");
+                mainApp.addTask2Progress();
                 return;
             }
 

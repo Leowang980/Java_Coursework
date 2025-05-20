@@ -128,7 +128,7 @@ public class Shape3DPanel extends JPanel {
         submitButton = new JButton("Submit");
         submitButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
-        submitButton.setForeground(Color.WHITE);
+        submitButton.setForeground(Color.BLACK);
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -184,7 +184,7 @@ public class Shape3DPanel extends JPanel {
         JButton nextButton = new JButton("Next Shape");
         nextButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextButton.setForeground(Color.WHITE);
+        nextButton.setForeground(Color.BLACK);
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -218,7 +218,7 @@ public class Shape3DPanel extends JPanel {
         JButton homeButton = new JButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
         homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.WHITE);
+        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -229,7 +229,7 @@ public class Shape3DPanel extends JPanel {
         JButton nextTaskButton = new JButton("Go to Task 2: Angle Types");
         nextTaskButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextTaskButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextTaskButton.setForeground(Color.WHITE);
+        nextTaskButton.setForeground(Color.BLACK);
         nextTaskButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

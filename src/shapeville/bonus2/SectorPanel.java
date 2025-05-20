@@ -749,7 +749,7 @@ public class SectorPanel extends JPanel {
     // 添加一个新方法来处理返回主页
     private void returnToHomeWithProgress() {
         if (isAllSectorsCompleted()) {
-            mainApp.updateProgress(100/6); // Bonus2 完成时更新主进度条
+            mainApp.updateProgress(100.0/6); // Bonus2 完成时更新主进度条
         }
         mainApp.returnToHome();
     }
@@ -767,7 +767,7 @@ public class SectorPanel extends JPanel {
     // 添加一个公共方法供外部调用来更新进度
     public void updateMainProgressIfCompleted() {
         if (isAllSectorsCompleted()) {
-            mainApp.updateProgress(100/6);
+            mainApp.updateProgress(100.0/6);
         }
     }
 

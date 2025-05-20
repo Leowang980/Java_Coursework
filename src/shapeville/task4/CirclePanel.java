@@ -139,7 +139,7 @@ public class CirclePanel extends JPanel {
         submitButton = new JButton("Submit");
         submitButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
-        submitButton.setForeground(Color.WHITE);
+        submitButton.setForeground(Color.BLACK);
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -193,7 +193,7 @@ public class CirclePanel extends JPanel {
         JButton nextButton = new JButton("Next Calculation");
         nextButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextButton.setForeground(Color.WHITE);
+        nextButton.setForeground(Color.BLACK);
         nextButton.addActionListener(new ActionListener() {
 
             @Override
@@ -265,7 +265,7 @@ public class CirclePanel extends JPanel {
         JButton homeButton = new JButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
         homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.WHITE);
+        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -281,7 +281,7 @@ public class CirclePanel extends JPanel {
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         // 新增：全部完成时加主进度
-        mainApp.addTask4Progress();
+        //mainApp.addTask4Progress();
         return panel;
     }
 
@@ -436,7 +436,7 @@ public class CirclePanel extends JPanel {
         JButton confirmButton = new JButton("Start Calculations");
         confirmButton.setFont(new Font("Arial", Font.BOLD, 14));
         confirmButton.setBackground(new Color(70, 130, 180));
-        confirmButton.setForeground(Color.WHITE);
+        confirmButton.setForeground(Color.BLACK);
         // 在 createSelectionPanel() 方法中修改确认按钮的逻辑
         confirmButton.addActionListener(e -> {
             if (!areaRadioButton.isSelected() && !circumferenceRadioButton.isSelected()) {

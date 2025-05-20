@@ -131,7 +131,7 @@ public class Shape2DPanel extends JPanel {
         submitButton = new JButton("Submit");
         submitButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
-        submitButton.setForeground(Color.WHITE);
+        submitButton.setForeground(Color.BLACK);
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -187,7 +187,7 @@ public class Shape2DPanel extends JPanel {
         JButton nextButton = new JButton("Next Shape");
         nextButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextButton.setForeground(Color.WHITE);
+        nextButton.setForeground(Color.BLACK);
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -223,12 +223,11 @@ public class Shape2DPanel extends JPanel {
         JButton homeButton = new JButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
         homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.WHITE);
+        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // 完成模块时，主进度条增加
-                mainApp.updateProgress(100/6);
                 mainApp.returnToHome();
             }
         });
@@ -236,12 +235,11 @@ public class Shape2DPanel extends JPanel {
         JButton goTo3DButton = new JButton("Continue to 3D Shapes");
         goTo3DButton.setFont(new Font("Arial", Font.BOLD, 14));
         goTo3DButton.setBackground(new Color(50, 205, 50)); // Lime green
-        goTo3DButton.setForeground(Color.WHITE);
+        goTo3DButton.setForeground(Color.BLACK);
         goTo3DButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // 完成模块时，主进度条增加
-                mainApp.updateProgress(100/6);
                 mainApp.startTask1_3D();
             }
         });

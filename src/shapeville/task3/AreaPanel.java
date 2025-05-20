@@ -24,6 +24,7 @@ public class AreaPanel extends JPanel {
     private JLabel feedbackLabel;
     private JLabel attemptsLabel;
     private JLabel timerLabel; // 移除了 progressLabel
+    private JProgressBar progressBar; // 新增进度条
 
     private List<GeometricShape> shapes;
     private GeometricShape currentShape;
@@ -32,10 +33,13 @@ public class AreaPanel extends JPanel {
     private int totalCompleted = 0;
     private Timer countdownTimer;
     private int secondsRemaining;
-
+    private boolean haveAddedProgress = true;
     private Random random = new Random();
     private DecimalFormat df = new DecimalFormat("#.##");
-
+    
+    // 新增：跟踪每个形状的完成状态
+    private boolean[] shapeCompleted = new boolean[4];
+    private JButton[] shapeButtons = new JButton[4];
 
     public AreaPanel(ShapevilleApp mainApp) {
         this.mainApp = mainApp;
@@ -74,6 +78,17 @@ public class AreaPanel extends JPanel {
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
         panel.add(titleLabel, BorderLayout.NORTH);
 
+        // 进度条面板
+        JPanel progressPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        progressPanel.setBackground(panel.getBackground());
+        progressBar = new JProgressBar(0, 4);
+        progressBar.setStringPainted(true);
+        progressBar.setString("Progress: " + totalCompleted + "/4");
+        progressBar.setValue(totalCompleted);
+        progressBar.setPreferredSize(new Dimension(300, 25));
+        progressPanel.add(progressBar);
+        panel.add(progressPanel, BorderLayout.CENTER);
+
         // 形状按钮面板（2x2网格布局）
         JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 20, 20));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -81,19 +96,37 @@ public class AreaPanel extends JPanel {
 
         // 定义四个形状名称
         String[] shapeNames = {"Rectangle", "Parallelogram", "Triangle", "Trapezium"};
-        for (String shapeName : shapeNames) {
-            JButton shapeButton = new JButton(shapeName);
+        for (int i = 0; i < shapeNames.length; i++) {
+            final int index = i;
+            JButton shapeButton = new JButton(shapeNames[i]);
             shapeButton.setFont(new Font("Arial", Font.BOLD, 16));
-            shapeButton.setBackground(new Color(70, 130, 180)); // 按钮颜色
-            shapeButton.setForeground(Color.WHITE);
+            shapeButton.setForeground(Color.BLACK);
+            
+            // 保存按钮引用
+            shapeButtons[i] = shapeButton;
+            
+            // 根据完成状态设置按钮样式
+            if (shapeCompleted[i]) {
+                shapeButton.setEnabled(false);
+                shapeButton.setText(shapeNames[i] + " ✓");
+                shapeButton.setBackground(new Color(144, 238, 144)); // 浅绿色表示完成
+            } else {
+                shapeButton.setBackground(new Color(70, 130, 180)); // 未完成时使用原来的颜色
+            }
+            
             shapeButton.setFocusPainted(false);
 
             // 点击按钮后跳转到对应形状的练习界面
-            shapeButton.addActionListener(e -> startSelectedShape(shapeName.toLowerCase()));
+            shapeButton.addActionListener(e -> {
+                if (!shapeCompleted[index]) {  // 只有在未完成时才允许点击
+                    startSelectedShape(shapeNames[index].toLowerCase());
+                }
+            });
+            
             buttonPanel.add(shapeButton);
         }
 
-        panel.add(buttonPanel, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
         return panel;
     }
     private void startSelectedShape(String shapeName) {
@@ -185,7 +218,7 @@ public class AreaPanel extends JPanel {
         submitButton = new JButton("Submit");
         submitButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
-        submitButton.setForeground(Color.WHITE);
+        submitButton.setForeground(Color.BLACK);
         submitButton.addActionListener(e -> checkAnswer());
 
         // Add enter key functionality to the text field
@@ -225,11 +258,15 @@ public class AreaPanel extends JPanel {
         JButton backButton = new JButton("Back to Selection");
         backButton.setFont(new Font("Arial", Font.BOLD, 14));
         backButton.setBackground(new Color(50, 205, 50)); // Lime green
-        backButton.setForeground(Color.WHITE);
+        backButton.setForeground(Color.BLACK);
         backButton.addActionListener(e -> {
             if (countdownTimer != null) {
                 countdownTimer.stop();
             }
+            System.out.println("totalCompleted: " + totalCompleted);
+            if (totalCompleted == 4) {
+                cardLayout.show(contentPanel, "COMPLETION");
+            }else{
             shapeDisplay.setShowSolution(false);
             currentShapeIndex++;
             //totalCompleted++;
@@ -237,6 +274,7 @@ public class AreaPanel extends JPanel {
             answerField.setEnabled(true);
             submitButton.setEnabled(true);
             cardLayout.show(contentPanel, "SELECTION"); // Return to selection screen
+            }       
         });
 
         buttonPanel.add(backButton);
@@ -259,10 +297,14 @@ public class AreaPanel extends JPanel {
         JButton homeButton = new JButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
         homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.WHITE);
+        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (haveAddedProgress) {
+                    haveAddedProgress = false;
+                    mainApp.updateProgress(100.0/6);
+                }
                 mainApp.returnToHome();
             }
         });
@@ -270,10 +312,14 @@ public class AreaPanel extends JPanel {
         JButton nextTaskButton = new JButton("Go to Task 4: Circle Calculations");
         nextTaskButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextTaskButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextTaskButton.setForeground(Color.WHITE);
+        nextTaskButton.setForeground(Color.BLACK);
         nextTaskButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (haveAddedProgress) {
+                    haveAddedProgress = false;
+                    mainApp.updateProgress(100.0/6);
+                }
                 mainApp.startTask4();
             }
         });
@@ -287,7 +333,7 @@ public class AreaPanel extends JPanel {
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         // 新增：全部完成时加主进度
-        mainApp.addTask3Progress();
+        //mainApp.addTask3Progress();
         return panel;
     }
 
@@ -417,28 +463,28 @@ public class AreaPanel extends JPanel {
             // Update score in main app
             mainApp.updateScore(score);
 
-            // Move to next shape
-            currentShapeIndex++;
-            totalCompleted++; // 完成数自增
+            // 更新完成状态
+            int shapeIndex = getShapeIndex(currentShape.getName());
+            if (shapeIndex != -1) {
+                shapeCompleted[shapeIndex] = true;
+                totalCompleted++;
+                
+                // 更新进度条
+                progressBar.setValue(totalCompleted);
+                progressBar.setString("Progress: " + totalCompleted + "/4");
+                
+                // 检查是否全部完成
+                /*if (totalCompleted == 4) {
+                    cardLayout.show(contentPanel, "COMPLETION");
+                }*/
+            }
 
-            // ========== 新增代码：更新全局进度条 ==========
-            //mainApp.updateProgress((100/24)); // 每完成一个形状增加1/24
-            mainApp.updateProgress((100/24)* totalCompleted);
             // Disable input until next shape
             answerField.setEnabled(false);
             submitButton.setEnabled(false);
 
-            // Enable after a short delay
-//            Timer timer = new Timer(1500, new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    displayNextShape();
-//                    answerField.setEnabled(true);
-//                    submitButton.setEnabled(true);
-//                }
-//            });
-//            timer.setRepeats(false);
-//            timer.start();
+            // 返回选择界面
+            answerField.setEnabled(true);
         } else {
             // Wrong answer
             feedbackLabel.setText("That's not correct. Try again!");
@@ -458,23 +504,37 @@ public class AreaPanel extends JPanel {
                 // Disable input until next shape
                 answerField.setEnabled(false);
                 submitButton.setEnabled(false);
-                totalCompleted++;
-                // Enable after a short delay
-//                Timer timer = new Timer(3000, new ActionListener() {
-//                    @Override
-//                    public void actionPerformed(ActionEvent e) {
-//                        shapeDisplay.setShowSolution(false);
-//                        currentShapeIndex++;
-//                        totalCompleted++;
-//                        displayNextShape();
-//                        answerField.setEnabled(true);
-//                        submitButton.setEnabled(true);
-//                    }
-//                });
-//                timer.setRepeats(false);
-//                timer.start();
+
+                // 更新完成状态
+                int shapeIndex = getShapeIndex(currentShape.getName());
+                if (shapeIndex != -1) {
+                    shapeCompleted[shapeIndex] = true;
+                    totalCompleted++;
+                    
+                    // 更新进度条
+                    progressBar.setValue(totalCompleted);
+                    progressBar.setString("Progress: " + totalCompleted + "/4");
+                    
+                    // 检查是否全部完成
+                    /*if (totalCompleted == 4) {
+                        cardLayout.show(contentPanel, "COMPLETION");
+                    }*/
+                }
+                shapeDisplay.setShowSolution(false);
+                answerField.setEnabled(true);
             }
         }
+    }
+
+    // 新增：获取形状索引的辅助方法
+    private int getShapeIndex(String shapeName) {
+        String[] shapeNames = {"rectangle", "parallelogram", "triangle", "trapezium"};
+        for (int i = 0; i < shapeNames.length; i++) {
+            if (shapeNames[i].equals(shapeName)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     // Inner class to display geometric shapes with their parameters

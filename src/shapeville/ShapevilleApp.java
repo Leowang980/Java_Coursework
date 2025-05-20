@@ -36,7 +36,7 @@ public class ShapevilleApp extends JFrame {
     private CirclePanel circlePanel;
     private JPanel sectorPanel; // Bonus2 扇形练习面板
     private JPanel compoundPanel; // Bonus1 扇形练习面板
-    
+    private double progress_total = 0.0;
     // Task 1 2D/3D完成标志
     private boolean task1_2dCompleted = false;
     private boolean task1_3dCompleted = false;
@@ -174,19 +174,9 @@ public class ShapevilleApp extends JFrame {
     // Methods to navigate between screens
     public void returnToHome() {
         // 检查 Bonus2 是否完成
-        if (sectorPanel != null && ((shapeville.bonus2.SectorPanel)sectorPanel).isAllSectorsCompleted()) {
-            updateProgress(100/6); // Bonus2 完成时更新主进度条
-        }
         cardLayout.show(contentPanel, HOME_SCREEN);
     }
     
-    // Bonus1 返回主页
-    public void returnToHomeBonus1() {
-        if (compoundPanel != null && ((shapeville.bonus1.CompoundPanel)compoundPanel).isAllCompoundsCompleted()) {
-            updateProgress(100/6); // Bonus1 完成时更新主进度条
-        }
-        cardLayout.show(contentPanel, HOME_SCREEN);
-    }
     private void endSession() {
         JOptionPane.showMessageDialog(this, 
                 "You have achieved " + totalScore + " points in this session. Goodbye!", 
@@ -287,8 +277,10 @@ public class ShapevilleApp extends JFrame {
         scoreLabel.setText("Score: " + totalScore);
     }
     
-    public void updateProgress(int progress) {
-        progressBar.setValue(progress);
+    public void updateProgress(double progress) {
+        progress_total += progress;
+        System.out.println("progress_total: " + progress_total);
+        progressBar.setValue((int)Math.round(progress_total));
     }
     
     public static void main(String[] args) {
@@ -311,28 +303,33 @@ public class ShapevilleApp extends JFrame {
      * Task1子模块完成时调用，part=0.5表示2D或3D各占一半
      */
     public void addTask1ProgressPart(double part) {
-        int increment = (int)Math.round(100.0 / 6 * part); // 1/12=8.33...%
+        double increment = 100.0 / 6 * part; // 1/12=8.33...%
         if (part == 0.5) {
             if (!task1_2dCompleted) {
-                totalProgress += increment;
+                totalProgress += (int)Math.round(increment);
                 task1_2dCompleted = true;
-                progressBar.setValue(totalProgress);
+                progress_total += increment;
+                System.out.println("progress_total: " + progress_total);
+                progressBar.setValue((int)Math.round(progress_total));
             }
         } else if (part == 1.5) { // 备用：全部完成
             if (!task1_2dCompleted || !task1_3dCompleted) {
                 totalProgress += increment * 2;
                 task1_2dCompleted = true;
                 task1_3dCompleted = true;
-                progressBar.setValue(totalProgress);
+                progress_total += increment * 2;
+                progressBar.setValue((int)Math.round(progress_total));
             }
         }
     }
     public void addTask1Progress3DPart() {
-        int increment = (int)Math.round(100.0 / 6 * 0.5);
+        double increment = 100.0 / 6 * 0.5;
         if (!task1_3dCompleted) {
-            totalProgress += increment;
+            totalProgress += (int)Math.round(increment);
             task1_3dCompleted = true;
-            progressBar.setValue(totalProgress);
+            progress_total += increment;
+            System.out.println("progress_total: " + progress_total);
+            progressBar.setValue((int)Math.round(progress_total));
         }
     }
     public boolean isTask1_2dCompleted() { return task1_2dCompleted; }
@@ -344,7 +341,7 @@ public class ShapevilleApp extends JFrame {
         if (!task2Completed) {
             totalProgress += increment;
             task2Completed = true;
-            progressBar.setValue(totalProgress);
+            progressBar.setValue(progressBar.getValue()+increment);
         }
     }
     public void addTask3Progress() {
@@ -352,7 +349,7 @@ public class ShapevilleApp extends JFrame {
         if (!task3Completed) {
             totalProgress += increment;
             task3Completed = true;
-            progressBar.setValue(totalProgress);
+            progressBar.setValue(progressBar.getValue()+increment);
         }
     }
     public void addTask4Progress() {
@@ -360,7 +357,7 @@ public class ShapevilleApp extends JFrame {
         if (!task4Completed) {
             totalProgress += increment;
             task4Completed = true;
-            progressBar.setValue(totalProgress);
+            progressBar.setValue(progressBar.getValue()+increment);
         }
     }
     public void addBonus1Progress() {
@@ -368,7 +365,7 @@ public class ShapevilleApp extends JFrame {
         if (!bonus1Completed) {
             totalProgress += increment;
             bonus1Completed = true;
-            progressBar.setValue(totalProgress);
+            progressBar.setValue(progressBar.getValue()+increment);
         }
     }
     public void addBonus2Progress() {
@@ -376,7 +373,7 @@ public class ShapevilleApp extends JFrame {
         if (!bonus2Completed) {
             totalProgress += increment;
             bonus2Completed = true;
-            progressBar.setValue(totalProgress);
+            progressBar.setValue(progressBar.getValue()+increment);
         }
     }
     public boolean isTask2Completed() { return task2Completed; }
