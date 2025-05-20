@@ -337,11 +337,13 @@ public class ShapevilleApp extends JFrame {
     
     // 统一进度加分方法
     public void addTask2Progress() {
-        int increment = 100 / 6;
+        double increment = 100.0 / 6;
         if (!task2Completed) {
-            totalProgress += increment;
+            totalProgress += (int)Math.round(increment);
             task2Completed = true;
-            progressBar.setValue(progressBar.getValue()+increment);
+            progress_total += increment;
+            System.out.println("progress_total: " + progress_total);
+            progressBar.setValue((int)Math.round(progress_total));
         }
     }
     public void addTask3Progress() {
@@ -353,11 +355,13 @@ public class ShapevilleApp extends JFrame {
         }
     }
     public void addTask4Progress() {
-        int increment = 100 / 6;
+        double increment = 100.0 / 6;
         if (!task4Completed) {
-            totalProgress += increment;
+            totalProgress += (int)Math.round(increment);
             task4Completed = true;
-            progressBar.setValue(progressBar.getValue()+increment);
+            progress_total += increment;
+            System.out.println("progress_total: " + progress_total);
+            progressBar.setValue((int)Math.round(progress_total));
         }
     }
     public void addBonus1Progress() {

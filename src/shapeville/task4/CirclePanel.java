@@ -269,6 +269,7 @@ public class CirclePanel extends JPanel {
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                mainApp.addTask4Progress();
                 mainApp.returnToHome();
             }
         });
