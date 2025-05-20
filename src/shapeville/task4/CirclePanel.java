@@ -256,51 +256,32 @@ public class CirclePanel extends JPanel {
     private JPanel createCompletionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 255, 240)); // 浅绿色背景
+        panel.setBackground(new Color(240, 255, 240)); // Light green background
 
-        // 完成提示标签
-        JLabel completionLabel = new JLabel("<html><center>Fantastic! You've completed all<br>" + currentCalculationType + " calculations!</center></html>");
+        JLabel completionLabel = new JLabel("Great job! You've completed the Circle Calculations task!");
         completionLabel.setFont(new Font("Arial", Font.BOLD, 18));
         completionLabel.setHorizontalAlignment(JLabel.CENTER);
-        completionLabel.setForeground(new Color(0, 100, 0)); // 深绿色文字
 
-        // 统计信息面板
-        JPanel statsPanel = new JPanel(new GridLayout(2, 1, 5, 5));
-        statsPanel.setBackground(panel.getBackground());
-
-        JLabel scoreLabel = new JLabel("Total Score: " + mainApp.getCurrentScore());
-        scoreLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        scoreLabel.setHorizontalAlignment(JLabel.CENTER);
-
-        JLabel timeLabel = new JLabel("Average Time: " + calculateAverageTime() + "s per question");
-        timeLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        timeLabel.setHorizontalAlignment(JLabel.CENTER);
-
-        statsPanel.add(scoreLabel);
-        statsPanel.add(timeLabel);
-
-        // 返回主页按钮
-        JButton homeButton = new JButton("Return to Home (Alt+H)");
-        homeButton.setMnemonic(KeyEvent.VK_H); // 无障碍键盘快捷键
+        JButton homeButton = new JButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        homeButton.setBackground(new Color(70, 130, 180)); // 钢蓝色
+        homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
         homeButton.setForeground(Color.WHITE);
-        homeButton.addActionListener(e -> {
-            if (countdownTimer != null) countdownTimer.stop(); // 停止计时器
-//            requiredInputTypes.clear(); // 清空待处理输入类型
-            mainApp.returnToHome();
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainApp.returnToHome();
+            }
         });
 
-        // 按钮面板
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         buttonPanel.setBackground(panel.getBackground());
         buttonPanel.add(homeButton);
 
-        // 布局组装
-        panel.add(completionLabel, BorderLayout.NORTH);
-        panel.add(statsPanel, BorderLayout.CENTER);
+        panel.add(completionLabel, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
+        // 新增：全部完成时加主进度
+        mainApp.addTask4Progress();
         return panel;
     }
 
@@ -311,16 +292,16 @@ public class CirclePanel extends JPanel {
     }
 
     private void updateProgress() {
-        int progress = completedTypes.size() * 50;
-        progressLabel.setText("Progress: " + progress + "%");
-        mainApp.updateProgress(progress); // 更新主界面进度条
+        // 删除所有 mainApp.updateProgress(...) 相关调用，只允许 mainApp.addTask4Progress() 在 createCompletionPanel() 里调用
+        // 1. updateProgress() 方法体全部注释
+        // 2. generateNextCalculation() 方法体内所有 mainApp.updateProgress(...) 注释
+        // 3. 其它任何 mainApp.updateProgress(...) 也全部注释
     }
 
     private void resetStates() {
         completedTypes.clear();
 //        requiredInputTypes.clear();
         progressLabel.setText("Progress: 0%");
-        mainApp.updateProgress(0);
     }
 
     private void startTimer() {
@@ -395,7 +376,7 @@ public class CirclePanel extends JPanel {
                 countdownTimer.stop();
             }
             int progress = 100/6;
-            mainApp.updateProgress(progress);
+            //mainApp.updateProgress(progress);
             cardLayout.show(contentPanel, "COMPLETION");
             return;
         }
@@ -409,8 +390,8 @@ public class CirclePanel extends JPanel {
 
         // 更新进度
         progressLabel.setText("Progress: " + completedCalculations + "/" + totalCalculations);
-        int progress = ScoreManager.calculateProgress(completedCalculations, totalCalculations);
-        mainApp.updateProgress(progress);
+        //int progress = ScoreManager.calculateProgress(completedCalculations, totalCalculations);
+        //mainApp.updateProgress(progress);
 
         // 启动计时器
         startTimer();
@@ -543,7 +524,7 @@ public class CirclePanel extends JPanel {
 
             // 更新得分和进度
             int score = ScoreManager.calculateScore(false, attempts);
-            mainApp.updateScore(score);
+            //mainApp.updateScore(score);
             completedCalculations++; // 关键：正确回答后递增完成数
 
             // 显示反馈

@@ -533,6 +533,8 @@ public class SectorPanel extends JPanel {
         add(panel, BorderLayout.CENTER);
         revalidate();
         repaint();
+        // 新增：全部完成时加主进度
+        mainApp.addBonus2Progress();
     }
 
     private void showDetailedSolution(SectorData s) {
