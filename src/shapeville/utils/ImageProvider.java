@@ -40,7 +40,7 @@ public class ImageProvider {
         // Shape outline style
         g2d.setStroke(new BasicStroke(3));
         
-        // Draw the shape based on its name
+        // Draw the shape based on its e
         drawShape2D(g2d, shapeName);
         
         g2d.dispose();
@@ -152,19 +152,18 @@ public class ImageProvider {
                 color = new Color(139, 69, 19); // Saddle Brown
                 shape = createRegularPolygon(centerX, centerY, size/2, 5);
                 break;
-                
+
+            case "kite":
+                color = new Color(255, 105, 180);
+                int[] kiteX = {centerX, centerX + size / 3, centerX, centerX - size / 3};
+                int[] kiteY = {centerY - size * 2 / 3, centerY, centerY + size / 3, centerY};
+                shape = new Polygon(kiteX, kiteY, 4);
+                break;
             case "rhombus":
-                color = new Color(32, 178, 170); // Light Sea Green
-                int[] rhombusX = {centerX, centerX + size/2, centerX, centerX - size/2};
+                color = new Color(32, 178, 170); // Pink
+                int[] rhombusX = {centerX, centerX + size/3, centerX, centerX - size/3};
                 int[] rhombusY = {centerY - size/2, centerY, centerY + size/2, centerY};
                 shape = new Polygon(rhombusX, rhombusY, 4);
-                break;
-                
-            case "kite":
-                color = new Color(255, 192, 203); // Pink
-                int[] kiteX = {centerX, centerX + size/3, centerX, centerX - size/3};
-                int[] kiteY = {centerY - size/2, centerY, centerY + size/2, centerY};
-                shape = new Polygon(kiteX, kiteY, 4);
                 break;
                 
             default:
