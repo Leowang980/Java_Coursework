@@ -143,24 +143,39 @@ public class CompoundPanel extends JPanel {
     }
 
     private JPanel createCompoundButton(CompoundData compound, int index) {
-        ImageIcon icon;
-        if(completedSectors[index]){
-            icon = new ImageIcon(compound.img_path.replace(".jpg", "_gray.jpg"));
-        }else{
-            icon = new ImageIcon(compound.img_path);
-        }
-        
-        if (icon.getImageLoadStatus() != MediaTracker.COMPLETE) {
-            System.err.println("Failed to load image: " + compound.img_path);
-        }
-        Image image = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(image);
-        
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(255, 250, 240));
         panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        
+
+        // 内容面板
+        JPanel contentPanel = new JPanel();
+        contentPanel.setOpaque(false);
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+
+        JLabel titleLabel = new JLabel("Compound Shape " + (index + 1));
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 22));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setForeground(completedSectors[index] ? Color.GRAY : new Color(101, 67, 33));
+        contentPanel.add(Box.createVerticalGlue());
+        contentPanel.add(titleLabel);
+
+        JLabel doneLabel = new JLabel("Done");
+        doneLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        doneLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        doneLabel.setForeground(Color.GRAY);
+        doneLabel.setVisible(completedSectors[index]);
+        contentPanel.add(Box.createVerticalStrut(8));
+        contentPanel.add(doneLabel);
+        contentPanel.add(Box.createVerticalGlue());
+
         JButton button = new WoodenButton("");
+        button.setLayout(new BorderLayout());
+        button.setBackground(completedSectors[index] ? new Color(220, 220, 220) : new Color(232, 194, 145));
+        button.setEnabled(!completedSectors[index]);
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(true);
+        button.setBorderPainted(false);
+        button.add(contentPanel, BorderLayout.CENTER);
         if (!completedSectors[index]) {
             button.addActionListener(new ActionListener() {
                 @Override
@@ -170,7 +185,6 @@ public class CompoundPanel extends JPanel {
             });
         }
         panel.add(button, BorderLayout.CENTER);
-        
         return panel;
     }
 

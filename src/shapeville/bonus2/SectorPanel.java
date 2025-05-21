@@ -88,7 +88,7 @@ public class SectorPanel extends JPanel {
         title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         panel.add(title, BorderLayout.NORTH);
         
-        // Grid of sectors
+        // Grid of sectors - changed to 2x4 grid
         sectorSelectionPanel = new JPanel(new GridLayout(2, 4, 10, 10));
         sectorSelectionPanel.setBackground(panel.getBackground());
         sectorSelectionPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -99,8 +99,7 @@ public class SectorPanel extends JPanel {
             if (!completedSectors[i]) {
                 allCompleted = false;
             }
-            SectorData sector = sectors.get(i);
-            JPanel sectorButton = createSectorButton(sector, i);
+            JPanel sectorButton = createSectorButton(i);
             sectorSelectionPanel.add(sectorButton);
         }
         
@@ -145,85 +144,53 @@ public class SectorPanel extends JPanel {
         repaint();
     }
 
-    private JPanel createSectorButton(SectorData sector, int index) {
+    private JPanel createSectorButton(int index) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(ColorConstants.BONUS_BG_COLOR);
+        panel.setBackground(new Color(255, 250, 240));
         panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        
-        // Create a small version of sector display
-        JPanel miniSectorPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                // 计算面板尺寸和中心点
-                int w = getWidth();
-                int h = getHeight();
-                int cx = w / 2;
-                int cy = h / 2;
-                
-                // 计算绘图尺寸和位置
-                int size = Math.min(w, h);
-                int x = (w - size) / 2;
-                int y = (h - size) / 2;
-                
-                // 设置颜色
-                if (completedSectors[index]) {
-                    g2.setColor(new Color(200, 200, 200)); // Gray for completed
-                } else {
-                    g2.setColor(new Color(255, 192, 203)); // Pink for uncompleted
-                }
-                
-                // 绘制扇形
-                g2.fillArc(x, y, size, size, 0, -sector.angle);
-                g2.setColor(Color.BLACK);
-                g2.setStroke(new BasicStroke(2));
-                g2.drawArc(x, y, size, size, 0, -sector.angle);
-                
-                // 绘制半径线
-                int radius = size / 2;
-                
-                // 第一条半径线 (0度)
-                int endX1 = cx + (int) Math.round(radius * Math.cos(0));
-                int endY1 = cy - (int) Math.round(radius * Math.sin(0));
-                g2.drawLine(cx, cy, endX1, endY1);
-                
-                // 第二条半径线 (-angle度)
-                double angleRad = Math.toRadians(-sector.angle);
-                int endX2 = cx + (int) Math.round(radius * Math.cos(angleRad));
-                int endY2 = cy - (int) Math.round(radius * Math.sin(angleRad));
-                g2.drawLine(cx, cy, endX2, endY2);
-            }
-            
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(100, 100);
-            }
-        };
-        miniSectorPanel.setOpaque(false);
-        
-        // Make the panel clickable
+
+        // Content panel
+        JPanel contentPanel = new JPanel();
+        contentPanel.setOpaque(false);
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+
+        // Title label (Sector & Arc N)
+        JLabel titleLabel = new JLabel("Sector & Arc " + (index + 1));
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 22));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setForeground(completedSectors[index] ? Color.GRAY : new Color(101, 67, 33));
+        contentPanel.add(Box.createVerticalGlue());
+        contentPanel.add(titleLabel);
+
+        // "Done" label for completed sectors
+        JLabel doneLabel = new JLabel("Done");
+        doneLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        doneLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        doneLabel.setForeground(Color.GRAY);
+        doneLabel.setVisible(completedSectors[index]);
+        contentPanel.add(Box.createVerticalStrut(8));
+        contentPanel.add(doneLabel);
+        contentPanel.add(Box.createVerticalGlue());
+
+        // Button with wooden style
+        JButton button = new WoodenButton("");
+        button.setLayout(new BorderLayout());
+        button.setBackground(completedSectors[index] ? new Color(220, 220, 220) : new Color(232, 194, 145));
+        button.setEnabled(!completedSectors[index]);
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(true);
+        button.setBorderPainted(false);
+        button.add(contentPanel, BorderLayout.CENTER);
         if (!completedSectors[index]) {
-            miniSectorPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            miniSectorPanel.addMouseListener(new MouseAdapter() {
+            button.addActionListener(new ActionListener() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void actionPerformed(ActionEvent e) {
                     startPractice(index);
                 }
             });
         }
         
-        panel.add(miniSectorPanel, BorderLayout.CENTER);
-        
-        // Add sector info
-        JLabel infoLabel = new JLabel(String.format("<html>r=%.2f %s<br>angle=%d°</html>", 
-                                    sector.radius, sector.unit, sector.angle));
-        infoLabel.setHorizontalAlignment(JLabel.CENTER);
-        infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        panel.add(infoLabel, BorderLayout.SOUTH);
-        
+        panel.add(button, BorderLayout.CENTER);
         return panel;
     }
 

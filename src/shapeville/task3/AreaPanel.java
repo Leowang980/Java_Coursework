@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -25,23 +24,22 @@ public class AreaPanel extends JPanel {
     private WoodenButton submitButton;
     private JLabel feedbackLabel;
     private JLabel attemptsLabel;
-    private JLabel timerLabel; // 移除了 progressLabel
-    private JProgressBar progressBar; // 新增进度条
+    private JLabel timerLabel;
+    private JProgressBar progressBar;
 
     private List<GeometricShape> shapes;
     private GeometricShape currentShape;
-    private int currentShapeIndex = 0;
     private int attempts = 0;
     private int totalCompleted = 0;
     private Timer countdownTimer;
     private int secondsRemaining;
     private boolean haveAddedProgress = true;
-    private Random random = new Random();
-    private DecimalFormat df = new DecimalFormat("#.##");
+    private final Random random = new Random();
+    private final DecimalFormat df = new DecimalFormat("#.##");
     
     // 新增：跟踪每个形状的完成状态
     private boolean[] shapeCompleted = new boolean[4];
-    private WoodenButton[] shapeButtons = new WoodenButton[4];
+    private JPanel[] shapePanels = new JPanel[4]; // Store panels instead of just buttons
 
     public AreaPanel(ShapevilleApp mainApp) {
         this.mainApp = mainApp;
@@ -74,27 +72,34 @@ public class AreaPanel extends JPanel {
     private JPanel createSelectionPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
+        panel.setBackground(ColorConstants.MAIN_BG_COLOR);
 
         // 标题标签
-        JLabel titleLabel = new JLabel("Select a Shape to Practice");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        titleLabel.setHorizontalAlignment(JLabel.CENTER);
-        panel.add(titleLabel, BorderLayout.NORTH);
+        JLabel selectionTitleLabel = new JLabel("Select a Shape to Practice");
+        selectionTitleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        selectionTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+        selectionTitleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        panel.add(selectionTitleLabel, BorderLayout.NORTH);
 
         // 进度条面板
-        JPanel progressPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel progressPanel = new JPanel(new BorderLayout());
         progressPanel.setBackground(panel.getBackground());
-        progressBar = new JProgressBar(0, 4);
+        
+        // Progress label
+        JLabel progressLabel = new JLabel(String.format("Completed: %d/4", totalCompleted));
+        progressLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        progressLabel.setHorizontalAlignment(JLabel.CENTER);
+        progressLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
+        progressPanel.add(progressLabel, BorderLayout.NORTH);
+        
+        progressBar = new JProgressBar(0, 100);
+        progressBar.setValue((int)((totalCompleted * 100.0) / 4));
         progressBar.setStringPainted(true);
-        progressBar.setString("Progress: " + totalCompleted + "/4");
-        progressBar.setValue(totalCompleted);
-        progressBar.setPreferredSize(new Dimension(300, 25));
-        progressPanel.add(progressBar);
-        panel.add(progressPanel, BorderLayout.CENTER);
+        progressBar.setString(progressBar.getValue() + "%");
+        progressPanel.add(progressBar, BorderLayout.CENTER);
 
         // 形状按钮面板（2x2网格布局）
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 20, 20));
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 15, 15));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         buttonPanel.setBackground(panel.getBackground());
 
@@ -102,33 +107,63 @@ public class AreaPanel extends JPanel {
         String[] shapeNames = {"Rectangle", "Parallelogram", "Triangle", "Trapezium"};
         for (int i = 0; i < shapeNames.length; i++) {
             final int index = i;
-            WoodenButton shapeButton = new WoodenButton(shapeNames[i]);
             
-            // 保存按钮引用
-            shapeButtons[i] = shapeButton;
+            // Use similar panel approach as in Bonus 1
+            JPanel shapePanel = new JPanel(new BorderLayout());
+            shapePanel.setBackground(new Color(255, 250, 240));
+            shapePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             
-            // 根据完成状态设置按钮样式
-            if (shapeCompleted[i]) {
-                shapeButton.setEnabled(false);
-                shapeButton.setText(shapeNames[i] + " ✓");
-                shapeButton.setBackground(ColorConstants.TASK_COMPLETED_COLOR); // 使用完成任务的颜色
-            } else {
-                shapeButton.setBackground(ColorConstants.FUNC_BUTTON_BG); // 使用功能按钮的颜色
+            // Content panel with box layout
+            JPanel contentPanel = new JPanel();
+            contentPanel.setOpaque(false);
+            contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+            
+            // Shape title with nice font
+            JLabel shapeTitleLabel = new JLabel(shapeNames[i]);
+            shapeTitleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+            shapeTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            shapeTitleLabel.setForeground(shapeCompleted[i] ? Color.GRAY : new Color(101, 67, 33));
+            contentPanel.add(Box.createVerticalGlue());
+            contentPanel.add(shapeTitleLabel);
+            
+            // Add "Done" label for completed shapes
+            JLabel doneLabel = new JLabel("Done");
+            doneLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+            doneLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            doneLabel.setForeground(Color.GRAY);
+            doneLabel.setVisible(shapeCompleted[i]);
+            contentPanel.add(Box.createVerticalStrut(8));
+            contentPanel.add(doneLabel);
+            contentPanel.add(Box.createVerticalGlue());
+            
+            // Create the wooden button to hold the content
+            JButton button = new WoodenButton("");
+            button.setLayout(new BorderLayout());
+            button.setBackground(shapeCompleted[i] ? new Color(220, 220, 220) : new Color(232, 194, 145));
+            button.setEnabled(!shapeCompleted[i]);
+            button.setFocusPainted(false);
+            button.setContentAreaFilled(true);
+            button.setBorderPainted(false);
+            button.add(contentPanel, BorderLayout.CENTER);
+            
+            if (!shapeCompleted[i]) {
+                button.addActionListener(e -> {
+                    startSelectedShape(shapeNames[index].toLowerCase());
+                });
             }
             
-            shapeButton.setFocusPainted(false);
-
-            // 点击按钮后跳转到对应形状的练习界面
-            shapeButton.addActionListener(e -> {
-                if (!shapeCompleted[index]) {  // 只有在未完成时才允许点击
-                    startSelectedShape(shapeNames[index].toLowerCase());
-                }
-            });
-            
-            buttonPanel.add(shapeButton);
+            shapePanel.add(button, BorderLayout.CENTER);
+            buttonPanel.add(shapePanel);
+            shapePanels[i] = shapePanel; // Store panel reference
         }
 
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(panel.getBackground());
+        centerPanel.add(buttonPanel, BorderLayout.CENTER);
+        
+        centerPanel.add(progressPanel, BorderLayout.SOUTH);
+        panel.add(centerPanel, BorderLayout.CENTER);
+
         return panel;
     }
     private void startSelectedShape(String shapeName) {
@@ -267,14 +302,12 @@ public class AreaPanel extends JPanel {
             if (totalCompleted == 4) {
                 mainApp.updateProgress(100.0/6);
                 cardLayout.show(contentPanel, "COMPLETION");
-            }else{
-            shapeDisplay.setShowSolution(false);
-            currentShapeIndex++;
-            //totalCompleted++;
-            displayNextShape();
-            answerField.setEnabled(true);
-            submitButton.setEnabled(true);
-            cardLayout.show(contentPanel, "SELECTION"); // Return to selection screen
+            } else {
+                shapeDisplay.setShowSolution(false);
+                displayNextShape();
+                answerField.setEnabled(true);
+                submitButton.setEnabled(true);
+                cardLayout.show(contentPanel, "SELECTION"); // Return to selection screen
             }       
         });
 
@@ -405,9 +438,6 @@ public class AreaPanel extends JPanel {
         // 直接返回形状选择界面
         cardLayout.show(contentPanel, "SELECTION");
 
-        // 重置当前形状索引（如果需要允许用户重新选择）
-        currentShapeIndex = 0; // 根据需求调整逻辑
-
         // 更新全局进度条（如果需要）
         //mainApp.updateProgress(0); // 重置为0或保持当前进度
     }
@@ -473,8 +503,8 @@ public class AreaPanel extends JPanel {
                 totalCompleted++;
                 
                 // 更新进度条
-                progressBar.setValue(totalCompleted);
-                progressBar.setString("Progress: " + totalCompleted + "/4");
+                progressBar.setValue((int)((totalCompleted * 100.0) / 4));
+                progressBar.setString(progressBar.getValue() + "%");
                 
                 // 检查是否全部完成
                 /*if (totalCompleted == 4) {
@@ -519,8 +549,8 @@ public class AreaPanel extends JPanel {
                     totalCompleted++;
                     
                     // 更新进度条
-                    progressBar.setValue(totalCompleted);
-                    progressBar.setString("Progress: " + totalCompleted + "/4");
+                    progressBar.setValue((int)((totalCompleted * 100.0) / 4));
+                    progressBar.setString(progressBar.getValue() + "%");
                     
                     // 检查是否全部完成
                     /*if (totalCompleted == 4) {

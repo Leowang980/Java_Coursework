@@ -395,71 +395,128 @@ public class CirclePanel extends JPanel {
     private void createSelectionPanel() {
         selectionPanel = new JPanel(new BorderLayout(10, 10));
         selectionPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        selectionPanel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
+        selectionPanel.setBackground(ColorConstants.MAIN_BG_COLOR);
 
         // 标题
-        JLabel titleLabel = new JLabel("Choose Calculation Type");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        titleLabel.setHorizontalAlignment(JLabel.CENTER);
-        selectionPanel.add(titleLabel, BorderLayout.NORTH);
+        JLabel selectionTitleLabel = new JLabel("Task 4: Choose Calculation Type");
+        selectionTitleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        selectionTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+        selectionTitleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
+        selectionPanel.add(selectionTitleLabel, BorderLayout.NORTH);
 
-        // 单选按钮面板
-        JPanel radioPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-        radioPanel.setBackground(selectionPanel.getBackground());
+        // 创建按钮面板 - 使用2行1列的网格，按钮垂直排列
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 1, 0, 30));
+        buttonPanel.setBackground(selectionPanel.getBackground());
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 100, 30, 100));
 
-        calculationTypeGroup = new ButtonGroup();
-
-        areaRadioButton = new JRadioButton("Area");
-        areaRadioButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        areaRadioButton.setBackground(selectionPanel.getBackground());
-
-        circumferenceRadioButton = new JRadioButton("Circumference");
-        circumferenceRadioButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        circumferenceRadioButton.setBackground(selectionPanel.getBackground());
-
-        calculationTypeGroup.add(areaRadioButton);
-        calculationTypeGroup.add(circumferenceRadioButton);
-
-        // 添加无障碍支持
-        areaRadioButton.setMnemonic(KeyEvent.VK_A);
-        circumferenceRadioButton.setMnemonic(KeyEvent.VK_C);
-
-        radioPanel.add(areaRadioButton);
-        radioPanel.add(circumferenceRadioButton);
-
-        // 确认按钮
-        WoodenButton confirmButton = new WoodenButton("Start Calculations");
-        confirmButton.addActionListener(e -> {
-            if (!areaRadioButton.isSelected() && !circumferenceRadioButton.isSelected()) {
-                JOptionPane.showMessageDialog(this, "Please select a calculation type!");
-                return;
-            }
-
-            // 设置新的计算类型
-            currentCalculationType = areaRadioButton.isSelected() ? "Area" : "Circumference";
-
-            // 初始化输入类型列表（每次选择后重新加载）
-//            requiredInputTypes.clear();
-//            requiredInputTypes.add("Radius");
-//            requiredInputTypes.add("Diameter");
-            // 新增：强制要求两种计算类型
+        // Create Area button with Bonus 1 style
+        JPanel areaPanel = new JPanel(new BorderLayout());
+        areaPanel.setBackground(new Color(255, 250, 240));
+        areaPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        
+        JPanel areaContentPanel = new JPanel();
+        areaContentPanel.setOpaque(false);
+        areaContentPanel.setLayout(new BoxLayout(areaContentPanel, BoxLayout.Y_AXIS));
+        
+        JLabel areaTitleLabel = new JLabel("Area");
+        areaTitleLabel.setFont(new Font("Serif", Font.BOLD, 28));
+        areaTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        areaTitleLabel.setForeground(new Color(101, 67, 33));
+        areaContentPanel.add(Box.createVerticalGlue());
+        areaContentPanel.add(areaTitleLabel);
+        
+        JLabel areaFormulaLabel = new JLabel("π × r²");
+        areaFormulaLabel.setFont(new Font("Serif", Font.ITALIC, 18));
+        areaFormulaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        areaFormulaLabel.setForeground(new Color(101, 67, 33));
+        areaContentPanel.add(Box.createVerticalStrut(10));
+        areaContentPanel.add(areaFormulaLabel);
+        areaContentPanel.add(Box.createVerticalGlue());
+        
+        JButton areaButton = new WoodenButton("");
+        areaButton.setLayout(new BorderLayout());
+        areaButton.setBackground(new Color(232, 194, 145));
+        areaButton.setFocusPainted(false);
+        areaButton.setContentAreaFilled(true);
+        areaButton.setBorderPainted(false);
+        areaButton.add(areaContentPanel, BorderLayout.CENTER);
+        
+        areaButton.addActionListener(e -> {
+            currentCalculationType = "Area";
             completedTypes.clear();
-            totalCalculations = 2; // 强制总任务数为2
+            totalCalculations = 2;
             progressLabel.setText("Progress: 0/" + totalCalculations);
-
-            // 跳转到任务界面
             cardLayout.show(contentPanel, "TASK");
-            nextCalculationType = currentCalculationType; // 初始为用户选择的类型
-            // 生成第一题（类型为用户选择的初始类型）
+            nextCalculationType = currentCalculationType;
             generateNextCalculation();
         });
+        
+        areaPanel.add(areaButton, BorderLayout.CENTER);
+        
+        // Create Circumference button with Bonus 1 style
+        JPanel circumferencePanel = new JPanel(new BorderLayout());
+        circumferencePanel.setBackground(new Color(255, 250, 240));
+        circumferencePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        
+        JPanel circumferenceContentPanel = new JPanel();
+        circumferenceContentPanel.setOpaque(false);
+        circumferenceContentPanel.setLayout(new BoxLayout(circumferenceContentPanel, BoxLayout.Y_AXIS));
+        
+        JLabel circumferenceTitleLabel = new JLabel("Circumference");
+        circumferenceTitleLabel.setFont(new Font("Serif", Font.BOLD, 28));
+        circumferenceTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        circumferenceTitleLabel.setForeground(new Color(101, 67, 33));
+        circumferenceContentPanel.add(Box.createVerticalGlue());
+        circumferenceContentPanel.add(circumferenceTitleLabel);
+        
+        JLabel circumferenceFormulaLabel = new JLabel("2π × r");
+        circumferenceFormulaLabel.setFont(new Font("Serif", Font.ITALIC, 18));
+        circumferenceFormulaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        circumferenceFormulaLabel.setForeground(new Color(101, 67, 33));
+        circumferenceContentPanel.add(Box.createVerticalStrut(10));
+        circumferenceContentPanel.add(circumferenceFormulaLabel);
+        circumferenceContentPanel.add(Box.createVerticalGlue());
+        
+        JButton circumferenceButton = new WoodenButton("");
+        circumferenceButton.setLayout(new BorderLayout());
+        circumferenceButton.setBackground(new Color(232, 194, 145));
+        circumferenceButton.setFocusPainted(false);
+        circumferenceButton.setContentAreaFilled(true);
+        circumferenceButton.setBorderPainted(false);
+        circumferenceButton.add(circumferenceContentPanel, BorderLayout.CENTER);
+        
+        circumferenceButton.addActionListener(e -> {
+            currentCalculationType = "Circumference";
+            completedTypes.clear();
+            totalCalculations = 2;
+            progressLabel.setText("Progress: 0/" + totalCalculations);
+            cardLayout.show(contentPanel, "TASK");
+            nextCalculationType = currentCalculationType;
+            generateNextCalculation();
+        });
+        
+        circumferencePanel.add(circumferenceButton, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(selectionPanel.getBackground());
-        buttonPanel.add(confirmButton);
-
-        selectionPanel.add(radioPanel, BorderLayout.CENTER);
-        selectionPanel.add(buttonPanel, BorderLayout.SOUTH);
+        // 将按钮添加到按钮面板
+        buttonPanel.add(areaPanel);
+        buttonPanel.add(circumferencePanel);
+        
+        // 添加进度面板
+        JPanel progressPanel = new JPanel(new BorderLayout());
+        progressPanel.setBackground(selectionPanel.getBackground());
+        
+        JLabel progressCompletedLabel = new JLabel("Complete both calculation types to advance");
+        progressCompletedLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        progressCompletedLabel.setHorizontalAlignment(JLabel.CENTER);
+        progressCompletedLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        progressPanel.add(progressCompletedLabel, BorderLayout.NORTH);
+        
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(selectionPanel.getBackground());
+        centerPanel.add(buttonPanel, BorderLayout.CENTER);
+        centerPanel.add(progressPanel, BorderLayout.SOUTH);
+        
+        selectionPanel.add(centerPanel, BorderLayout.CENTER);
     }
 
     private double calculateCorrectAnswer() {

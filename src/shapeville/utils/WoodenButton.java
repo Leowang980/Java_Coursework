@@ -9,7 +9,7 @@ public class WoodenButton extends JButton {
     private static final Color BG_COLOR = new Color(232, 194, 145);
     private static final Color BORDER_COLOR = new Color(160, 82, 45);
     private static final Color FONT_COLOR = new Color(101, 67, 33);
-    private static final Font BUTTON_FONT = new Font("Serif", Font.BOLD, 14);
+    private static final Font BUTTON_FONT = new Font("Serif", Font.BOLD, 16);
     private static final int ARC = 16;
     private boolean hovered = false;
     private String description = null;

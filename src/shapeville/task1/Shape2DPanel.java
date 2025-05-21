@@ -30,9 +30,10 @@ public class Shape2DPanel extends JPanel {
 
     private List<Shape2D> shapes;
     private Shape2D currentShape;
-    private int currentShapeIndex = 0;
     private int attempts = 0;
     private int totalCompleted = 0;
+
+    private WoodenButton nextButton;
 
     public Shape2DPanel(ShapevilleApp mainApp) {
         this.mainApp = mainApp;
@@ -203,20 +204,17 @@ public class Shape2DPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(panel.getBackground());
 
-        WoodenButton nextButton = new WoodenButton("Next Shape");
+        nextButton = new WoodenButton("Next Shape");
         nextButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (currentShapeIndex < shapes.size()) {
-                    currentShapeIndex++;
-                    totalCompleted++;
-                    displayNextShape();
-                    answerField.setEnabled(true);
-                    submitButton.setEnabled(true);
-                }
+                displayNextShape();
+                answerField.setEnabled(true);
+                submitButton.setEnabled(true);
             }
         });
+        nextButton.setEnabled(false);
 
         buttonPanel.add(nextButton);
 
@@ -266,6 +264,7 @@ public class Shape2DPanel extends JPanel {
     }
 
     private void displayNextShape() {
+        nextButton.setEnabled(false);
         if (shapes.isEmpty()) {
             // All shapes have been answered, show completion panel
             cardLayout.show(contentPanel, "COMPLETION");
@@ -375,6 +374,7 @@ public class Shape2DPanel extends JPanel {
 
         // Update the module score label
         moduleScoreLabel.setText("Module Score: " + moduleScore);
+        nextButton.setEnabled(true);
     }
 
     private void filterAnsweredShapes() {
