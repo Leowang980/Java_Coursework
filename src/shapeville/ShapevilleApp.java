@@ -10,6 +10,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class ShapevilleApp extends JFrame {
     private JPanel contentPanel;
@@ -19,6 +21,7 @@ public class ShapevilleApp extends JFrame {
     private int totalScore = 0;
     
     // Constants for the different screens
+    public static final String START_SCREEN = "START";
     public static final String HOME_SCREEN = "HOME";
     public static final String SHAPE_2D_SCREEN = "SHAPE_2D";
     public static final String SHAPE_3D_SCREEN = "SHAPE_3D";
@@ -29,6 +32,7 @@ public class ShapevilleApp extends JFrame {
     public static final String SECTOR_SCREEN = "SECTOR";
     
     // Task panels
+    private StartScreen startScreen;
     private Shape2DPanel shape2DPanel;
     private Shape3DPanel shape3DPanel;
     private AnglePanel anglePanel;
@@ -47,16 +51,20 @@ public class ShapevilleApp extends JFrame {
     private boolean bonus1Completed = false;
     private boolean bonus2Completed = false;
     private int totalProgress = 0; // 记录总进度百分比
+    private int accessLevel = 0; // 0=none, 1=Key Stage 1, 2=Key Stage 2, 3=All
     
     public ShapevilleApp() {
         setTitle("Shapeville - Learning Geometry");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(1200, 800);
         setLocationRelativeTo(null);
         
         // Initialize the layout
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
+        
+        // Create start screen
+        startScreen = new StartScreen(this);
         
         // Create panels for different screens
         JPanel homePanel = createHomePanel();
@@ -64,6 +72,7 @@ public class ShapevilleApp extends JFrame {
         // Create task panels (we will initialize them lazily to improve startup time)
         
         // Add panels to the card layout
+        contentPanel.add(startScreen, START_SCREEN);
         contentPanel.add(homePanel, HOME_SCREEN);
         
         // Add the main content panel
@@ -72,6 +81,12 @@ public class ShapevilleApp extends JFrame {
         // Create and add the navigation panel at the bottom
         JPanel navPanel = createNavigationPanel();
         add(navPanel, BorderLayout.SOUTH);
+        
+        // Show start screen by default
+        cardLayout.show(contentPanel, START_SCREEN);
+        
+        // Hide the progress bar initially (will show only in home screen)
+        navPanel.setVisible(false);
     }
     
     private JPanel createHomePanel() {
@@ -92,13 +107,13 @@ public class ShapevilleApp extends JFrame {
         centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         centerPanel.setBackground(new Color(240, 248, 255));
         
-        // Add task buttons
-        addTaskButton(centerPanel, "Task 1: Shape Identification", "Learn to identify 2D and 3D shapes", e -> startTask1());
-        addTaskButton(centerPanel, "Task 2: Angle Types", "Learn to identify different types of angles", e -> startTask2());
-        addTaskButton(centerPanel, "Task 3: Area Calculation", "Calculate areas of different shapes", e -> startTask3());
-        addTaskButton(centerPanel, "Task 4: Circle Calculations", "Calculate area and circumference", e -> startTask4());
-        addTaskButton(centerPanel, "Bonus 1: Compound Shapes", "Calculate areas of compound shapes", e -> startBonus1());
-        addTaskButton(centerPanel, "Bonus 2: Sector & Arc", "Calculate sector area and arc length", e -> startBonus2());
+        // Add task buttons with lock status based on access level
+        addTaskButton(centerPanel, "Task 1: Shape Identification", "Learn to identify 2D and 3D shapes", e -> startTask1(), 1);
+        addTaskButton(centerPanel, "Task 2: Angle Types", "Learn to identify different types of angles", e -> startTask2(), 1);
+        addTaskButton(centerPanel, "Task 3: Area Calculation", "Calculate areas of different shapes", e -> startTask3(), 2);
+        addTaskButton(centerPanel, "Task 4: Circle Calculations", "Calculate area and circumference", e -> startTask4(), 2);
+        addTaskButton(centerPanel, "Bonus 1: Compound Shapes", "Calculate areas of compound shapes", e -> startBonus1(), 3);
+        addTaskButton(centerPanel, "Bonus 2: Sector & Arc", "Calculate sector area and arc length", e -> startBonus2(), 3);
         
         panel.add(centerPanel, BorderLayout.CENTER);
         
@@ -118,7 +133,7 @@ public class ShapevilleApp extends JFrame {
         return panel;
     }
     
-    private void addTaskButton(JPanel panel, String title, String description, ActionListener action) {
+    private void addTaskButton(JPanel panel, String title, String description, ActionListener action, int requiredLevel) {
         JButton button = new JButton("<html><center>" + title + "<br><font size='-1'>" + description + "</font></center></html>");
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setBackground(new Color(135, 206, 250)); // Light sky blue
@@ -127,7 +142,31 @@ public class ShapevilleApp extends JFrame {
         button.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(70, 130, 180), 2),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-        button.addActionListener(action);
+        
+        // Add button with action if accessible based on access level
+        if (accessLevel >= requiredLevel) {
+            button.addActionListener(action);
+        } else {
+            // Add lock icon and disable button if not accessible
+            try {
+                ImageIcon lockIcon = new ImageIcon(getClass().getResource("/shapeville/images/enter_page/lock.png"));
+                // Scale the lock icon to an appropriate size
+                Image scaledImage = lockIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+                lockIcon = new ImageIcon(scaledImage);
+                
+                button.setText("<html><center>" + title + "<br><font size='-1'>" + description + 
+                        "</font></center></html>");
+                button.setIcon(lockIcon);
+                button.setEnabled(false);
+                button.setDisabledIcon(lockIcon);
+            } catch (Exception e) {
+                // If lock icon cannot be loaded, just use text
+                button.setText("<html><center>" + title + "<br><font size='-1'>" + description + 
+                        "</font><br><font color='red'>(🔒 Locked)</font></center></html>");
+                button.setEnabled(false);
+            }
+        }
+        
         panel.add(button);
     }
     
@@ -156,12 +195,16 @@ public class ShapevilleApp extends JFrame {
         rightPanel.setBackground(panel.getBackground());
         rightPanel.add(scoreLabel);
         
+        JButton backButton = new JButton("Back to Start");
+        backButton.addActionListener(e -> returnToStartScreen());
+        
         JButton homeButton = new JButton("Home");
         homeButton.addActionListener(e -> returnToHome());
         
         JButton endButton = new JButton("End Session");
         endButton.addActionListener(e -> endSession());
         
+        rightPanel.add(backButton);
         rightPanel.add(homeButton);
         rightPanel.add(endButton);
         
@@ -172,9 +215,60 @@ public class ShapevilleApp extends JFrame {
     }
     
     // Methods to navigate between screens
-    public void returnToHome() {
-        // 检查 Bonus2 是否完成
+    public void startHomeScreen() {
+        // Remove existing home panel if it exists
+        for (Component comp : contentPanel.getComponents()) {
+            if (comp != startScreen) {
+                contentPanel.remove(comp);
+            }
+        }
+        
+        // Create a new home panel with updated access level
+        JPanel homePanel = createHomePanel();
+        contentPanel.add(homePanel, HOME_SCREEN);
+        
+        // Show the updated home panel
         cardLayout.show(contentPanel, HOME_SCREEN);
+        
+        // Show navigation panel with progress bar
+        getContentPane().getComponent(1).setVisible(true);
+        
+        // Add key listener to handle Escape key
+        homePanel.setFocusable(true);
+        homePanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    returnToStartScreen(); // Go back to start screen
+                }
+            }
+        });
+        homePanel.requestFocusInWindow();
+    }
+    
+    private Component findPanelByName(String name) {
+        // This method had issues - we don't need it anymore
+        for (Component comp : contentPanel.getComponents()) {
+            if (comp instanceof JPanel) {
+                return comp;
+            }
+        }
+        return null;
+    }
+    
+    public void returnToHome() {
+        startHomeScreen();
+    }
+    
+    public void returnToStartScreen() {
+        // Hide navigation panel
+        getContentPane().getComponent(1).setVisible(false);
+        
+        // Show start screen
+        cardLayout.show(contentPanel, START_SCREEN);
+        
+        // Request focus for the start screen to capture key events
+        startScreen.requestFocusInWindow();
     }
     
     private void endSession() {
@@ -385,4 +479,10 @@ public class ShapevilleApp extends JFrame {
     public boolean isTask4Completed() { return task4Completed; }
     public boolean isBonus1Completed() { return bonus1Completed; }
     public boolean isBonus2Completed() { return bonus2Completed; }
+    
+    // Set access level based on start screen selection
+    public void setAccessLevel(int level) {
+        this.accessLevel = level;
+        System.out.println("Access level set to: " + level);
+    }
 } 
