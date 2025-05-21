@@ -12,7 +12,7 @@ import java.util.Map;
  * This avoids the need to include actual image files with the application.
  */
 public class ImageProvider {
-    private static final int IMAGE_SIZE = 201;
+    private static final int IMAGE_SIZE = 200;
     private static final Map<String, ImageIcon> imageCache = new HashMap<>();
     
     /**
