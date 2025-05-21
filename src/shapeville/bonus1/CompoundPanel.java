@@ -146,7 +146,7 @@ public class CompoundPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(255, 250, 240));
         panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
+        
         // 内容面板
         JPanel contentPanel = new JPanel();
         contentPanel.setOpaque(false);

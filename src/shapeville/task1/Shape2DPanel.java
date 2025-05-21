@@ -103,7 +103,7 @@ public class Shape2DPanel extends JPanel {
     private JPanel createTaskPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
-        
+
         // Title panel
         JPanel titlePanel = new JPanel();
         titlePanel.setBackground(ColorConstants.TITLE_BG_COLOR); // 使用木质风格的标题背景色
@@ -112,7 +112,7 @@ public class Shape2DPanel extends JPanel {
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
         panel.add(titlePanel, BorderLayout.NORTH);
-        
+
         // Center panel with shape image
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(panel.getBackground());
@@ -209,9 +209,9 @@ public class Shape2DPanel extends JPanel {
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                displayNextShape();
-                answerField.setEnabled(true);
-                submitButton.setEnabled(true);
+                    displayNextShape();
+                    answerField.setEnabled(true);
+                    submitButton.setEnabled(true);
             }
         });
         nextButton.setEnabled(false);

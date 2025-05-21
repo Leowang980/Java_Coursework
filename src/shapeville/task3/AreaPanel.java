@@ -303,11 +303,11 @@ public class AreaPanel extends JPanel {
                 mainApp.updateProgress(100.0/6);
                 cardLayout.show(contentPanel, "COMPLETION");
             } else {
-                shapeDisplay.setShowSolution(false);
-                displayNextShape();
-                answerField.setEnabled(true);
-                submitButton.setEnabled(true);
-                cardLayout.show(contentPanel, "SELECTION"); // Return to selection screen
+            shapeDisplay.setShowSolution(false);
+            displayNextShape();
+            answerField.setEnabled(true);
+            submitButton.setEnabled(true);
+            cardLayout.show(contentPanel, "SELECTION"); // Return to selection screen
             }       
         });
 

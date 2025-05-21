@@ -80,7 +80,7 @@ public class AnglePanel extends JPanel {
     private JPanel createTaskPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(ColorConstants.MAIN_BG_COLOR);
-        
+
         // Title panel
         JPanel titlePanel = new JPanel();
         titlePanel.setBackground(ColorConstants.TITLE_BG_COLOR);
@@ -89,7 +89,7 @@ public class AnglePanel extends JPanel {
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
         panel.add(titlePanel, BorderLayout.NORTH);
-        
+
         // Center panel with the angle display
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(panel.getBackground());

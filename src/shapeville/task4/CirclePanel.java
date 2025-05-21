@@ -452,7 +452,7 @@ public class CirclePanel extends JPanel {
         });
         
         areaPanel.add(areaButton, BorderLayout.CENTER);
-        
+
         // Create Circumference button with Bonus 1 style
         JPanel circumferencePanel = new JPanel(new BorderLayout());
         circumferencePanel.setBackground(new Color(255, 250, 240));
@@ -494,7 +494,7 @@ public class CirclePanel extends JPanel {
             nextCalculationType = currentCalculationType;
             generateNextCalculation();
         });
-        
+
         circumferencePanel.add(circumferenceButton, BorderLayout.CENTER);
 
         // 将按钮添加到按钮面板

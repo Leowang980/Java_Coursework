@@ -45,6 +45,9 @@ public class Shape3DPanel extends JPanel {
         // Shuffle the shapes to randomize the order
         Collections.shuffle(shapes);
 
+        // 过滤已答过的题
+        filterAnsweredShapes();
+
         // Set up the layout
         setLayout(new BorderLayout());
 
@@ -208,8 +211,15 @@ public class Shape3DPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(ColorConstants.SUCCESS_BG_COLOR);
         
-        // 新增：显示本模块得分
-        JLabel completionLabel = new JLabel("Congratulations! You've completed the 3D Shapes Identification task!\nModule Score: " + moduleScore);
+        // 新增：显示2D、3D和总分
+        int score2d = ScoreManager.getTask1_2dScore();
+        int score3d = ScoreManager.getTask1_3dScore();
+        int total = score2d + score3d;
+        String html = "<html>Congratulations! You've completed the 3D Shapes Identification task!<br>" +
+                "2D Module Score: <b>" + score2d + "</b><br>" +
+                "3D Module Score: <b>" + score3d + "</b><br>" +
+                "<span style='font-size:16pt'>Total for Task 1: <b>" + total + "</b></span></html>";
+        JLabel completionLabel = new JLabel(html);
         completionLabel.setFont(new Font("Arial", Font.BOLD, 18));
         completionLabel.setHorizontalAlignment(JLabel.CENTER);
 
@@ -302,7 +312,8 @@ public class Shape3DPanel extends JPanel {
         attempts++;
         attemptsLabel.setText("Attempts: " + attempts + "/" + ScoreManager.MAX_ATTEMPTS);
 
-        if (userAnswer.equals(currentShape.getName())) {
+        boolean correct = userAnswer.equals(currentShape.getName());
+        if (correct) {
             // Correct answer
             int score = ScoreManager.calculateScore(true, attempts); // Advanced level
             String feedback = ScoreManager.getFeedbackMessage(score);
@@ -315,6 +326,8 @@ public class Shape3DPanel extends JPanel {
             // 新增：更新模块分数
             moduleScore += score;
             moduleScoreLabel.setText("Module Score: " + moduleScore);
+            // 持久化3D分数
+            ScoreManager.addToTask1_3dScore(score);
 
             // Disable input fields
             answerField.setEnabled(false);
@@ -327,11 +340,15 @@ public class Shape3DPanel extends JPanel {
             // If max attempts reached, show correct answer
             if (attempts >= ScoreManager.MAX_ATTEMPTS) {
                 feedbackLabel.setText("The correct answer is: " + currentShape.getName());
-
                 // Disable input fields
                 answerField.setEnabled(false);
                 submitButton.setEnabled(false);
             }
+        }
+        // 无论对错都记录已答题
+        if (!ScoreManager.isShape3DAnswered(currentShape.getName())) {
+            ScoreManager.markShape3DAnswered(currentShape.getName());
+            totalCompleted = ScoreManager.getTask1_3dProgress();
         }
     }
 
@@ -352,5 +369,15 @@ public class Shape3DPanel extends JPanel {
         public String getImagePath() {
             return imagePath;
         }
+    }
+
+    private void filterAnsweredShapes() {
+        List<Shape3D> unanswered = new ArrayList<>();
+        for (Shape3D shape : shapes) {
+            if (!ScoreManager.isShape3DAnswered(shape.getName())) {
+                unanswered.add(shape);
+            }
+        }
+        shapes = unanswered;
     }
 }

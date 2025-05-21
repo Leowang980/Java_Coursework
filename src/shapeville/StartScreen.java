@@ -15,6 +15,18 @@ public class StartScreen extends JPanel implements KeyListener {
     private Image cloudImage;
     private Image lockImage;
     private Image bonusImage;
+    private Image doorImage;
+    private Image doorOpenImage; // Added door open image
+    
+    // Door state management
+    private boolean isDoorOpening = false;
+    private long doorOpenTime = 0;
+    private final int DOOR_OPEN_DELAY = 1000; // 1 second delay
+    
+    // Add Key Stage 1 navigation delay management
+    private boolean keyStage1NavigationPending = false;
+    private long keyStage1NavigationTime = 0;
+    private final int KEY_STAGE1_NAVIGATION_DELAY = 5000; // 5 seconds delay
     
     // Add navigation control flag
     private boolean navigationTriggered = false;
@@ -32,6 +44,10 @@ public class StartScreen extends JPanel implements KeyListener {
     private int fallVelocity = 0;
     private int gravity = 1;
     private int groundLevel = 620; // Starting ground level
+    
+    // Button standing state
+    private boolean standingOnStage1 = false;
+    private boolean standingOnStage2 = false;
     
     // Game areas
     private Rectangle titleArea = new Rectangle(350, 320, 500, 120);
@@ -77,7 +93,11 @@ public class StartScreen extends JPanel implements KeyListener {
             cloudImage = new ImageIcon(getClass().getResource("/shapeville/images/start_backgound/cloud_example.png")).getImage();
             lockImage = new ImageIcon(getClass().getResource("/shapeville/images/enter_page/lock.png")).getImage();
             bonusImage = new ImageIcon(getClass().getResource("/shapeville/images/start_backgound/bonus.png")).getImage();
+            doorImage = new ImageIcon(getClass().getResource("/shapeville/images/start_backgound/Door.png")).getImage();
+            doorOpenImage = new ImageIcon(getClass().getResource("/shapeville/images/start_backgound/Door_open.png")).getImage();
             System.out.println("Bonus image loaded: " + (bonusImage != null)); // Debug
+            System.out.println("Door image loaded: " + (doorImage != null)); // Debug
+            System.out.println("Door open image loaded: " + (doorOpenImage != null)); // Debug
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -124,7 +144,11 @@ public class StartScreen extends JPanel implements KeyListener {
                 } else if (keyStage2Area.contains(e.getPoint())) {
                     navigateToMainScreen(2); // Key Stage 2
                 } else if (bonusButtonArea.contains(e.getPoint()) || bonusCaveArea.contains(e.getPoint())) {
-                    navigateToMainScreen(3); // Bonus Task
+                    // If clicked on the door, start the door opening sequence
+                    if (!isDoorOpening && !navigationTriggered) {
+                        isDoorOpening = true;
+                        doorOpenTime = System.currentTimeMillis();
+                    }
                 }
             }
         });
@@ -142,28 +166,32 @@ public class StartScreen extends JPanel implements KeyListener {
                     
                     int rightMargin = 30;
                     
-                    // Set size and position for the cave/black square - aligned with bottom
-                    bonusCaveArea.width = 180; 
-                    bonusCaveArea.height = 180;
+                    // Set size and position for the door - aligned with bottom
+                    // Adjust size to maintain door proportions (taller than wide)
+                    bonusCaveArea.width = 140;
+                    bonusCaveArea.height = 200;
                     bonusCaveArea.x = getWidth() - bonusCaveArea.width - rightMargin;
                     bonusCaveArea.y = getHeight() - bonusCaveArea.height; // Align with bottom
                     
-                    // Position the button ABOVE the cave
+                    // Position the button ABOVE the door
                     bonusButtonArea.width = 120;
                     bonusButtonArea.height = 35;
                     bonusButtonArea.x = bonusCaveArea.x + (bonusCaveArea.width - bonusButtonArea.width) / 2;
-                    bonusButtonArea.y = bonusCaveArea.y - bonusButtonArea.height - 5; // Above the cave
+                    bonusButtonArea.y = bonusCaveArea.y - bonusButtonArea.height - 5; // Above the door
                     
-                    // If person hasn't fallen yet, adjust to ground level
-                    if (!isJumping && !isFalling && personY != groundLevel) {
-                        personY = groundLevel;
-                    }
-                    
-                    // Check if person is inside the bonus cave to trigger navigation
-                    if (!navigationTriggered && !isJumping && !isFalling && 
+                    // Check if person is near the door to trigger door opening
+                    if (!isDoorOpening && !navigationTriggered && !isJumping && !isFalling && 
                         personX + personWidth > bonusCaveArea.x && 
                         personX < bonusCaveArea.x + bonusCaveArea.width &&
-                        personY + personHeight > bonusCaveArea.y) {
+                        personY + personHeight >= bonusCaveArea.y + bonusCaveArea.height - 30) {
+                        // Start door opening sequence
+                        isDoorOpening = true;
+                        doorOpenTime = System.currentTimeMillis();
+                    }
+                    
+                    // Check if it's time to navigate after door has been open for the delay period
+                    if (isDoorOpening && !navigationTriggered && 
+                        System.currentTimeMillis() - doorOpenTime >= DOOR_OPEN_DELAY) {
                         // Set flag to prevent repeated navigation
                         navigationTriggered = true;
                         // Navigate to Bonus Tasks (level 3)
@@ -194,20 +222,113 @@ public class StartScreen extends JPanel implements KeyListener {
             titlePulseDirection *= -1;
         }
         
+        // Reset button standing states
+        boolean wasStandingOnStage1 = standingOnStage1;
+        standingOnStage1 = false;
+        standingOnStage2 = false;
+        
         // Update little person physics if needed
         if (isJumping || isFalling) {
             // Apply gravity
             fallVelocity += gravity;
             personY += fallVelocity;
             
-            // Check if we've landed on the ground
+            // Check if we've landed on the ground or on a button
             if (personY >= groundLevel) {
+                // Landed on ground
                 personY = groundLevel;
                 isJumping = false;
                 isFalling = false;
                 fallVelocity = 0;
                 jumpCount = 0;
+                
+                // Cancel any pending navigation since we're on the ground
+                keyStage1NavigationPending = false;
+            } else {
+                // Check if landed on Key Stage 1 button
+                if (fallVelocity > 0 &&
+                    personX + personWidth/2 >= keyStage1Area.x &&
+                    personX + personWidth/2 <= keyStage1Area.x + keyStage1Area.width &&
+                    personY + personHeight <= keyStage1Area.y + 5 &&
+                    personY + personHeight + fallVelocity >= keyStage1Area.y) {
+                    
+                    // Land on Key Stage 1 button
+                    personY = keyStage1Area.y - personHeight;
+                    isJumping = false;
+                    isFalling = false;
+                    fallVelocity = 0;
+                    jumpCount = 0;
+                    standingOnStage1 = true;
+                    
+                    // Start Key Stage 1 navigation timer if not already pending
+                    if (!keyStage1NavigationPending && !navigationTriggered) {
+                        keyStage1NavigationPending = true;
+                        keyStage1NavigationTime = System.currentTimeMillis();
+                    }
+                }
+                
+                // Check if landed on Key Stage 2 button
+                else if (fallVelocity > 0 &&
+                    personX + personWidth/2 >= keyStage2Area.x &&
+                    personX + personWidth/2 <= keyStage2Area.x + keyStage2Area.width &&
+                    personY + personHeight <= keyStage2Area.y + 5 &&
+                    personY + personHeight + fallVelocity >= keyStage2Area.y) {
+                    
+                    // Land on Key Stage 2 button
+                    personY = keyStage2Area.y - personHeight;
+                    isJumping = false;
+                    isFalling = false;
+                    fallVelocity = 0;
+                    jumpCount = 0;
+                    standingOnStage2 = true;
+                    
+                    // Cancel any pending Key Stage 1 navigation when landing on Key Stage 2
+                    keyStage1NavigationPending = false;
+                }
             }
+        } else {
+            // Check if we're standing on a button
+            if (personY + personHeight == keyStage1Area.y &&
+                personX + personWidth/2 >= keyStage1Area.x &&
+                personX + personWidth/2 <= keyStage1Area.x + keyStage1Area.width) {
+                standingOnStage1 = true;
+                
+                // Start Key Stage 1 navigation timer if not already pending
+                if (!keyStage1NavigationPending && !navigationTriggered) {
+                    keyStage1NavigationPending = true;
+                    keyStage1NavigationTime = System.currentTimeMillis();
+                }
+            } else if (personY + personHeight == keyStage2Area.y &&
+                       personX + personWidth/2 >= keyStage2Area.x &&
+                       personX + personWidth/2 <= keyStage2Area.x + keyStage2Area.width) {
+                standingOnStage2 = true;
+                
+                // Cancel any pending Key Stage 1 navigation when standing on Key Stage 2
+                keyStage1NavigationPending = false;
+            } else if (personY < groundLevel && !isJumping) {
+                // If we're not on ground and not on a button, start falling
+                isFalling = true;
+                
+                // Cancel any pending navigation if we're not on Key Stage 1 button anymore
+                if (!standingOnStage1) {
+                    keyStage1NavigationPending = false;
+                }
+            }
+        }
+        
+        // If we were standing on stage 1 but now we're not, cancel navigation
+        if (wasStandingOnStage1 && !standingOnStage1) {
+            keyStage1NavigationPending = false;
+        }
+        
+        // Check if Key Stage 1 navigation delay has passed
+        if (keyStage1NavigationPending && !navigationTriggered && 
+            System.currentTimeMillis() - keyStage1NavigationTime >= KEY_STAGE1_NAVIGATION_DELAY) {
+            // Set flag to prevent repeated navigation
+            keyStage1NavigationPending = false;
+            navigationTriggered = true;
+            // Navigate to Key Stage 1
+            navigateToMainScreen(1);
         }
     }
     
@@ -259,8 +380,8 @@ public class StartScreen extends JPanel implements KeyListener {
         drawShapevilleTitle(g2d);
         
         // Draw Key Stage signs
-        drawKeyStageSign(g2d, keyStage2Area, "Key Stage 2", keyStage2Hover);
-        drawKeyStageSign(g2d, keyStage1Area, "Key Stage 1", keyStage1Hover);
+        drawKeyStageSign(g2d, keyStage2Area, "Key Stage 2", keyStage2Hover || standingOnStage2);
+        drawKeyStageSign(g2d, keyStage1Area, "Key Stage 1", keyStage1Hover || standingOnStage1);
         
         // Draw Bonus Tasks button in the bottom right corner
         drawBonusButton(g2d);
@@ -409,7 +530,7 @@ public class StartScreen extends JPanel implements KeyListener {
         g2d.setTransform(oldTransform);
     }
     
-    private void drawKeyStageSign(Graphics2D g2d, Rectangle area, String text, boolean isHovered) {
+    private void drawKeyStageSign(Graphics2D g2d, Rectangle area, String text, boolean isHighlighted) {
         int x = area.x;
         int y = area.y;
         int width = area.width;
@@ -441,9 +562,9 @@ public class StartScreen extends JPanel implements KeyListener {
         // Draw blue triangle decorations along the top edge - pointing inward
         drawBlueTriangles(g2d, x, y, width, true);
         
-        // Add highlight effect if hovered
-        if (isHovered) {
-            g2d.setColor(new Color(255, 255, 150, 40));
+        // Add highlight effect if hovered or character is standing on it
+        if (isHighlighted) {
+            g2d.setColor(new Color(255, 255, 150, 80)); // Brighter highlight for standing
             g2d.fillRoundRect(x, y, width, height, 15, 15);
         }
         
@@ -548,15 +669,18 @@ public class StartScreen extends JPanel implements KeyListener {
     }
     
     private void drawBonusButton(Graphics2D g2d) {
-        // First draw the black square with orange border (cave area)
-        // Draw the black background square
-        g2d.setColor(Color.BLACK);
-        g2d.fillRoundRect(bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, 15, 15);
-        
-        // Draw the orange border
-        g2d.setColor(new Color(210, 105, 30)); // Dark orange-brown
-        g2d.setStroke(new BasicStroke(8));
-        g2d.drawRoundRect(bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, 15, 15);
+        // Draw the door image - either closed or open depending on state
+        if (isDoorOpening && doorOpenImage != null) {
+            // Draw the open door when opening animation is active
+            g2d.drawImage(doorOpenImage, bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, this);
+        } else if (doorImage != null) {
+            // Draw the closed door normally
+            g2d.drawImage(doorImage, bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, this);
+        } else {
+            // Fallback to black rectangle if images fail to load
+            g2d.setColor(Color.BLACK);
+            g2d.fillRoundRect(bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, 15, 15);
+        }
         
         // Draw the wooden sign for Bonus Tasks ABOVE the cave
         g2d.setColor(new Color(232, 194, 145)); // Light wooden color
@@ -571,8 +695,10 @@ public class StartScreen extends JPanel implements KeyListener {
         if (bonusButtonHover) {
             g2d.setColor(new Color(255, 255, 150, 40));
             g2d.fillRoundRect(bonusButtonArea.x, bonusButtonArea.y, bonusButtonArea.width, bonusButtonArea.height, 10, 10);
-            // Also highlight the cave area
+            // Also highlight the door area with a subtle glow
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
             g2d.fillRoundRect(bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, 15, 15);
+            g2d.setComposite(AlphaComposite.SrcOver);
         }
         
         // Draw text
@@ -605,10 +731,22 @@ public class StartScreen extends JPanel implements KeyListener {
                 isJumping = true;
                 fallVelocity = jumpVelocity;
                 jumpCount = 1;
+                
+                // If standing on Key Stage 2 button, navigate immediately
+                // For Key Stage 1, the delay is handled in updateAnimations
+                if (standingOnStage2) {
+                    navigateToMainScreen(2); // Key Stage 2
+                }
             } else if (jumpCount < maxJumpCount) {
                 // Multi-jump
                 fallVelocity = jumpVelocity;
                 jumpCount++;
+            }
+        } else if (key == KeyEvent.VK_ENTER) {
+            // Enter key can navigate if standing on a button
+            // For Key Stage 1, the delay is handled in updateAnimations
+            if (standingOnStage2) {
+                navigateToMainScreen(2); // Key Stage 2
             }
         }
         
@@ -700,6 +838,10 @@ public class StartScreen extends JPanel implements KeyListener {
     public void resetNavigation() {
         // Reset navigation flag
         navigationTriggered = false;
+        isDoorOpening = false;
+        keyStage1NavigationPending = false;
+        standingOnStage1 = false;
+        standingOnStage2 = false;
         
         // Reset character position to starting point
         personX = 180;

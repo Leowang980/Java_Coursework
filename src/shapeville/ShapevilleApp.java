@@ -132,14 +132,14 @@ public class ShapevilleApp extends JFrame {
         JPanel titlePanel = new JPanel();
         titlePanel.setBackground(ColorConstants.TITLE_BG_COLOR); // 使用木质风格的标题背景色
         JLabel titleLabel = new JLabel("Welcome to Shapeville!");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28)); // 增大标题字体
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
         panel.add(titlePanel, BorderLayout.NORTH);
         
         // Center panel with task buttons
-        JPanel centerPanel = new JPanel(new GridLayout(3, 2, 20, 20));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        JPanel centerPanel = new JPanel(new GridLayout(3, 2, 30, 30)); // 增加网格间距
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40)); // 增加内边距
         centerPanel.setBackground(ColorConstants.MAIN_BG_COLOR);
         
         // Add task buttons with lock status based on access level
@@ -155,22 +155,22 @@ public class ShapevilleApp extends JFrame {
         // Game info panel
         JPanel infoPanel = new JPanel(new BorderLayout());
         infoPanel.setBackground(ColorConstants.MAIN_BG_COLOR);
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25)); // 增加内边距
         
         // 使用普通文本而不是HTML
         JLabel infoLabel = new JLabel("Game Levels and Scoring:");
-        infoLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        infoLabel.setFont(new Font("Arial", Font.BOLD, 16)); // 增大字体
         infoPanel.add(infoLabel, BorderLayout.NORTH);
         
         // 添加详细信息
-        JPanel detailsPanel = new JPanel(new GridLayout(2, 1));
+        JPanel detailsPanel = new JPanel(new GridLayout(2, 1, 0, 5)); // 增加行间距
         detailsPanel.setBackground(infoPanel.getBackground());
         
         JLabel basicLabel = new JLabel("Basic level: 3 points (1st attempt), 2 points (2nd attempt), 1 point (3rd attempt)");
-        basicLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        basicLabel.setFont(new Font("Arial", Font.PLAIN, 16)); // 增大字体
         
         JLabel advancedLabel = new JLabel("Advanced level: 6 points (1st attempt), 4 points (2nd attempt), 2 points (3rd attempt)");
-        advancedLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        advancedLabel.setFont(new Font("Arial", Font.PLAIN, 16)); // 增大字体
         
         detailsPanel.add(basicLabel);
         detailsPanel.add(advancedLabel);

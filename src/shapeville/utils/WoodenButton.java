@@ -9,7 +9,7 @@ public class WoodenButton extends JButton {
     private static final Color BG_COLOR = new Color(232, 194, 145);
     private static final Color BORDER_COLOR = new Color(160, 82, 45);
     private static final Color FONT_COLOR = new Color(101, 67, 33);
-    private static final Font BUTTON_FONT = new Font("Serif", Font.BOLD, 16);
+    private static final Font BUTTON_FONT = new Font("Serif", Font.BOLD, 22);
     private static final int ARC = 16;
     private boolean hovered = false;
     private String description = null;
@@ -33,7 +33,7 @@ public class WoodenButton extends JButton {
         setForeground(FONT_COLOR);
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         setOpaque(false);
-        setMargin(new Insets(8, 20, 8, 20));
+        setMargin(new Insets(12, 24, 12, 24));
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -76,18 +76,18 @@ public class WoodenButton extends JButton {
             int titleWidth = fm.stringWidth(text);
             int titleHeight = fm.getAscent();
             int x = (getWidth() - titleWidth) / 2;
-            int y = getHeight() / 2 - 5;  // 标题在上半部分
+            int y = getHeight() / 2 - 10;  // 标题在上半部分，增加间距
             
             // 绘制标题
             g2.drawString(text, x, y);
             
-            // 绘制描述 (使用较小字体)
-            Font descFont = new Font(BUTTON_FONT.getName(), Font.PLAIN, BUTTON_FONT.getSize() - 2);
+            // 绘制描述 (使用较小字体，但依然更大)
+            Font descFont = new Font(BUTTON_FONT.getName(), Font.PLAIN, 18);
             g2.setFont(descFont);
             fm = g2.getFontMetrics();
             int descWidth = fm.stringWidth(description);
             x = (getWidth() - descWidth) / 2;
-            y = getHeight() / 2 + fm.getAscent() + 5; // 描述在下半部分
+            y = getHeight() / 2 + fm.getAscent() + 10; // 描述在下半部分，增加间距
             g2.drawString(description, x, y);
         } else {
             // 只有标题文本，居中绘制
