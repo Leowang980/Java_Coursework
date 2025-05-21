@@ -2,6 +2,8 @@ package shapeville.task1;
 
 import shapeville.ScoreManager;
 import shapeville.ShapevilleApp;
+import shapeville.utils.WoodenButton;
+import shapeville.utils.ColorConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +20,7 @@ public class Shape3DPanel extends JPanel {
 
     private JLabel shapeImageLabel;
     private JTextField answerField;
-    private JButton submitButton;
+    private WoodenButton submitButton;
     private JLabel feedbackLabel;
     private JLabel attemptsLabel;
     private JLabel progressLabel;
@@ -79,20 +81,19 @@ public class Shape3DPanel extends JPanel {
     }
 
     private JPanel createTaskPanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 248, 255)); // Light blue background
-
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(ColorConstants.MAIN_BG_COLOR);
+        
         // Title panel
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(70, 130, 180)); // Steel blue
+        titlePanel.setBackground(ColorConstants.TITLE_BG_COLOR);
         JLabel titleLabel = new JLabel("Task 1: 3D Shape Identification");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
         panel.add(titlePanel, BorderLayout.NORTH);
-
-        // Center panel with the shape image
+        
+        // Center panel with shape image
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(panel.getBackground());
 
@@ -125,7 +126,7 @@ public class Shape3DPanel extends JPanel {
         answerField = new JTextField(15);
         answerField.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        submitButton = new JButton("Submit");
+        submitButton = new WoodenButton("Submit");
         submitButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
         submitButton.setForeground(Color.BLACK);
@@ -181,10 +182,8 @@ public class Shape3DPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(panel.getBackground());
 
-        JButton nextButton = new JButton("Next Shape");
+        WoodenButton nextButton = new WoodenButton("Next Shape");
         nextButton.setFont(new Font("Arial", Font.BOLD, 14));
-        nextButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextButton.setForeground(Color.BLACK);
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -207,18 +206,15 @@ public class Shape3DPanel extends JPanel {
 
     private JPanel createCompletionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 255, 240)); // Light green background
-
+        panel.setBackground(ColorConstants.SUCCESS_BG_COLOR);
+        
         // 新增：显示本模块得分
         JLabel completionLabel = new JLabel("Congratulations! You've completed the 3D Shapes Identification task!\nModule Score: " + moduleScore);
         completionLabel.setFont(new Font("Arial", Font.BOLD, 18));
         completionLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        JButton homeButton = new JButton("Return to Home");
+        WoodenButton homeButton = new WoodenButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -226,10 +222,8 @@ public class Shape3DPanel extends JPanel {
             }
         });
 
-        JButton nextTaskButton = new JButton("Go to Task 2: Angle Types");
+        WoodenButton nextTaskButton = new WoodenButton("Go to Task 2: Angle Types");
         nextTaskButton.setFont(new Font("Arial", Font.BOLD, 14));
-        nextTaskButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextTaskButton.setForeground(Color.BLACK);
         nextTaskButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

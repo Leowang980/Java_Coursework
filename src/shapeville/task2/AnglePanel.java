@@ -2,6 +2,8 @@ package shapeville.task2;
 
 import shapeville.ScoreManager;
 import shapeville.ShapevilleApp;
+import shapeville.utils.WoodenButton;
+import shapeville.utils.ColorConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,9 +24,9 @@ public class AnglePanel extends JPanel {
 
     private AngleDisplay angleDisplay;
     private JTextField angleInputField;
-    private JButton submitAngleButton;
+    private WoodenButton submitAngleButton;
     private JTextField answerField;
-    private JButton submitAnswerButton;
+    private WoodenButton submitAnswerButton;
     private JLabel feedbackLabel;
     private JLabel attemptsLabel;
     private JLabel progressLabel;
@@ -40,7 +42,13 @@ public class AnglePanel extends JPanel {
         this.cardLayout = new CardLayout();
         this.contentPanel = new JPanel(cardLayout);
 
+        // Load saved progress
         identifiedAngleTypes = new HashSet<>();
+        if (ScoreManager.isAngleTypeAnswered("acute")) identifiedAngleTypes.add("acute");
+        if (ScoreManager.isAngleTypeAnswered("right")) identifiedAngleTypes.add("right");
+        if (ScoreManager.isAngleTypeAnswered("obtuse")) identifiedAngleTypes.add("obtuse");
+        if (ScoreManager.isAngleTypeAnswered("straight")) identifiedAngleTypes.add("straight");
+        if (ScoreManager.isAngleTypeAnswered("reflex")) identifiedAngleTypes.add("reflex");
 
         // Set up the layout
         setLayout(new BorderLayout());
@@ -56,24 +64,32 @@ public class AnglePanel extends JPanel {
         // Add the content panel to this panel
         add(contentPanel, BorderLayout.CENTER);
 
-        // Show the task panel first
-        cardLayout.show(contentPanel, "TASK");
+        // If all 5 angle types are already identified, show completion
+        if (identifiedAngleTypes.size() >= 5) {
+            cardLayout.show(contentPanel, "COMPLETION");
+            mainApp.addTask2Progress();
+        } else {
+            // Show the task panel first
+            cardLayout.show(contentPanel, "TASK");
+            
+            // Update progress display
+            progressLabel.setText("Identified Types: " + identifiedAngleTypes.size() + "/5");
+        }
     }
 
     private JPanel createTaskPanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 248, 255)); // Light blue background
-
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(ColorConstants.MAIN_BG_COLOR);
+        
         // Title panel
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(70, 130, 180)); // Steel blue
-        JLabel titleLabel = new JLabel("Task 2: Angle Type Identification");
+        titlePanel.setBackground(ColorConstants.TITLE_BG_COLOR);
+        JLabel titleLabel = new JLabel("Task 2: Angle Types");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
         panel.add(titlePanel, BorderLayout.NORTH);
-
+        
         // Center panel with the angle display
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(panel.getBackground());
@@ -106,7 +122,7 @@ public class AnglePanel extends JPanel {
         angleInputField = new JTextField(10);
         angleInputField.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        submitAngleButton = new JButton("Submit Angle");
+        submitAngleButton = new WoodenButton("Submit Angle");
         submitAngleButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitAngleButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
         submitAngleButton.setForeground(Color.BLACK);
@@ -138,14 +154,14 @@ public class AnglePanel extends JPanel {
         JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         inputPanel.setBackground(panel.getBackground());
 
-        JLabel promptLabel = new JLabel("Enter the type of this angle (acute, right, obtuse, reflex):");
+        JLabel promptLabel = new JLabel("Enter the type of this angle (acute, right, obtuse, straight, reflex):");
         promptLabel.setFont(new Font("Arial", Font.PLAIN, 14));
 
         answerField = new JTextField(15);
         answerField.setFont(new Font("Arial", Font.PLAIN, 14));
         answerField.setEnabled(false);
 
-        submitAnswerButton = new JButton("Submit");
+        submitAnswerButton = new WoodenButton("Submit");
         submitAnswerButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitAnswerButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
         submitAnswerButton.setForeground(Color.BLACK);
@@ -181,7 +197,7 @@ public class AnglePanel extends JPanel {
         attemptsLabel = new JLabel("Attempts: 0/" + ScoreManager.MAX_ATTEMPTS);
         attemptsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        progressLabel = new JLabel("Identified Types: 0/4");
+        progressLabel = new JLabel("Identified Types: 0/5");
         progressLabel.setFont(new Font("Arial", Font.PLAIN, 14));
 
         feedbackPanel.add(feedbackLabel);
@@ -195,10 +211,8 @@ public class AnglePanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(panel.getBackground());
 
-        JButton homeButton = new JButton("Return to Home");
+        WoodenButton homeButton = new WoodenButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -216,7 +230,7 @@ public class AnglePanel extends JPanel {
     }
 
     private JPanel createAngleInfoPanel() {
-        JPanel panel = new JPanel(new GridLayout(1, 4, 5, 5));
+        JPanel panel = new JPanel(new GridLayout(1, 5, 5, 5));
         panel.setBorder(BorderFactory.createTitledBorder("Angle Types"));
         panel.setBackground(new Color(240, 248, 255));
 
@@ -231,6 +245,10 @@ public class AnglePanel extends JPanel {
         // Obtuse angle info
         JPanel obtusePanel = createAngleTypeInfoPanel("Obtuse", "90° to 180°", new Color(255, 182, 193));
         panel.add(obtusePanel);
+        
+        // Straight angle info
+        JPanel straightPanel = createAngleTypeInfoPanel("Straight", "= 180°", new Color(255, 215, 0));
+        panel.add(straightPanel);
 
         // Reflex angle info
         JPanel reflexPanel = createAngleTypeInfoPanel("Reflex", "> 180°", new Color(221, 160, 221));
@@ -261,16 +279,14 @@ public class AnglePanel extends JPanel {
     private JPanel createCompletionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 255, 240)); // Light green background
+        panel.setBackground(ColorConstants.SUCCESS_BG_COLOR);
 
         JLabel completionLabel = new JLabel("Excellent! You've identified all 4 angle types!");
         completionLabel.setFont(new Font("Arial", Font.BOLD, 18));
         completionLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        JButton homeButton = new JButton("Return to Home");
+        WoodenButton homeButton = new WoodenButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -278,10 +294,8 @@ public class AnglePanel extends JPanel {
             }
         });
 
-        JButton nextTaskButton = new JButton("Go to Task 3: Area Calculation");
+        WoodenButton nextTaskButton = new WoodenButton("Go to Task 3: Area Calculation");
         nextTaskButton.setFont(new Font("Arial", Font.BOLD, 14));
-        nextTaskButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextTaskButton.setForeground(Color.BLACK);
         nextTaskButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -338,6 +352,8 @@ public class AnglePanel extends JPanel {
             return "right";
         } else if (degrees < 180) {
             return "obtuse";
+        } else if (degrees == 180) {
+            return "straight";
         } else {
             return "reflex";
         }
@@ -365,23 +381,27 @@ public class AnglePanel extends JPanel {
 
             // Update score in main app
             mainApp.updateScore(score);
+            // Update module score
+            ScoreManager.addToTask2Score(score);
 
+            // Add to identified types and persist progress
             identifiedAngleTypes.add(currentAngleType);
-            progressLabel.setText("Identified Types: " + identifiedAngleTypes.size() + "/4");
+            ScoreManager.markAngleTypeAnswered(currentAngleType);
+            progressLabel.setText("Identified Types: " + identifiedAngleTypes.size() + "/5");
 
-            if (identifiedAngleTypes.size() == 4) {
+            if (identifiedAngleTypes.size() == 5) {
                 cardLayout.show(contentPanel, "COMPLETION");
                 mainApp.addTask2Progress();
                 return;
             }
 
-            // Enable angle input field and submit button
+            // Enable angle input field and submit button for next question
             angleInputField.setEnabled(true);
             submitAngleButton.setEnabled(true);
             angleInputField.setText("");
             angleInputField.requestFocus();
 
-            // Disable input until next angle
+            // Disable answer input until next angle
             answerField.setEnabled(false);
             submitAnswerButton.setEnabled(false);
         } else {

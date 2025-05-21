@@ -2,6 +2,8 @@ package shapeville.bonus2;
 
 import shapeville.ScoreManager;
 import shapeville.ShapevilleApp;
+import shapeville.utils.WoodenButton;
+import shapeville.utils.ColorConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +39,7 @@ public class SectorPanel extends JPanel {
     private JPanel practicePanel; // Panel for practice interface
     private JLabel promptLabel, attemptsLabel, progressLabel, timerLabel, feedbackLabel;
     private JTextField areaField, perimeterField;
-    private JButton submitButton, homeButton, nextButton;
+    private WoodenButton submitButton, homeButton, nextButton;
     private JPanel mainPanel;
     private DecimalFormat df = new DecimalFormat("0.00");
 
@@ -76,7 +78,8 @@ public class SectorPanel extends JPanel {
         removeAll();
         
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(255, 250, 240));
+        panel.setBackground(ColorConstants.BONUS_BG_COLOR);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         // Title
         JLabel title = new JLabel("Bonus 2: Select a Sector to Practice");
@@ -128,7 +131,7 @@ public class SectorPanel extends JPanel {
         
         // If all sectors are completed, show return to home button
         if (allCompleted) {
-            JButton homeButton = new JButton("Return to Home");
+            WoodenButton homeButton = new WoodenButton("Return to Home");
             homeButton.addActionListener(e -> returnToHomeWithProgress());
             JPanel buttonPanel = new JPanel();
             buttonPanel.setBackground(panel.getBackground());
@@ -144,7 +147,7 @@ public class SectorPanel extends JPanel {
 
     private JPanel createSectorButton(SectorData sector, int index) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(255, 250, 240));
+        panel.setBackground(ColorConstants.BONUS_BG_COLOR);
         panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         
         // Create a small version of sector display
@@ -236,8 +239,8 @@ public class SectorPanel extends JPanel {
     // 创建主界面
     private JPanel createMainPanel() {
         mainPanel = new JPanel(new BorderLayout(0, 0));
+        mainPanel.setBackground(ColorConstants.BONUS_BG_COLOR);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        mainPanel.setBackground(new Color(255, 250, 240));
 
         JLabel title = new JLabel("Bonus 2: Sector Area & Perimeter");
         title.setFont(new Font("Arial", Font.BOLD, 20));
@@ -298,14 +301,9 @@ public class SectorPanel extends JPanel {
         inputPanel.add(perimeterField);
         inputPanel.add(Box.createVerticalStrut(15));
 
-        submitButton = new JButton("Submit");
-        submitButton.setFont(new Font("Arial", Font.BOLD, 14));
-        submitButton.setBackground(new Color(255, 0, 0)); // Red background
-        submitButton.setForeground(Color.WHITE); // White text
+        submitButton = new WoodenButton("Submit");
         submitButton.setFocusPainted(false);
-        submitButton.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        submitButton.setOpaque(true); // 确保背景色可见
-        submitButton.setBorderPainted(false); // 移除边框
+        submitButton.setBorderPainted(false);
         submitButton.addActionListener(e -> checkAnswer());
         inputPanel.add(submitButton);
         
@@ -355,11 +353,7 @@ public class SectorPanel extends JPanel {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         btnPanel.setBackground(mainPanel.getBackground());
 
-        nextButton = new JButton("Next");
-        nextButton.setFont(new Font("Arial", Font.BOLD, 14));
-        nextButton.setBackground(new Color(50, 205, 50));
-        nextButton.setForeground(Color.BLACK);
-        nextButton.setFocusPainted(false);
+        nextButton = new WoodenButton("Next");
         nextButton.setEnabled(false);
         nextButton.addActionListener(e -> nextSector());
         btnPanel.add(nextButton);
@@ -515,17 +509,12 @@ public class SectorPanel extends JPanel {
     private void showCompletionPanel() {
         removeAll();
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 255, 240));
+        panel.setBackground(ColorConstants.SUCCESS_BG_COLOR);
         JLabel label = new JLabel("Congratulations! All sectors completed!");
         label.setFont(new Font("Arial", Font.BOLD, 18));
         label.setHorizontalAlignment(JLabel.CENTER);
         panel.add(label, BorderLayout.CENTER);
-        JButton homeBtn = new JButton("Home");
-        homeBtn.setFont(new Font("Arial", Font.BOLD, 14));
-        homeBtn.setBackground(new Color(70, 130, 180));
-        homeBtn.setForeground(Color.WHITE);
-        homeBtn.setFocusPainted(false);
+        WoodenButton homeBtn = new WoodenButton("Home");
         homeBtn.addActionListener(e -> returnToHomeWithProgress());
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnPanel.setBackground(panel.getBackground());
@@ -623,7 +612,6 @@ public class SectorPanel extends JPanel {
                 inputPanel.add(areaField);
                 inputPanel.add(Box.createVerticalStrut(10));
                 inputPanel.add(perimeterField);
-                inputPanel.add(Box.createVerticalStrut(15));
                 inputPanel.add(submitButton);
                 
                 rightPanel.add(inputPanel);

@@ -17,6 +17,9 @@ import java.awt.event.KeyEvent; // 新增此行
 import java.util.List;
 import java.util.ArrayList;
 
+import shapeville.utils.WoodenButton;
+import shapeville.utils.ColorConstants;
+
 public class CirclePanel extends JPanel {
     private final ShapevilleApp mainApp;
     private final CardLayout cardLayout;
@@ -24,7 +27,7 @@ public class CirclePanel extends JPanel {
 
     private CircleDisplay circleDisplay;
     private JTextField answerField;
-    private JButton submitButton;
+    private WoodenButton submitButton;
     private JLabel feedbackLabel;
     private JLabel attemptsLabel;
     private JLabel progressLabel;
@@ -96,11 +99,11 @@ public class CirclePanel extends JPanel {
     private JPanel createTaskPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 248, 255)); // Light blue background
+        panel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
 
         // Title panel
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(70, 130, 180)); // Steel blue
+        titlePanel.setBackground(ColorConstants.TITLE_BG_COLOR); // 使用木质风格的标题背景色
         JLabel titleLabel = new JLabel("Task 4: Circle Calculations");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
@@ -136,10 +139,7 @@ public class CirclePanel extends JPanel {
         answerField = new JTextField(15);
         answerField.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        submitButton = new JButton("Submit");
-        submitButton.setFont(new Font("Arial", Font.BOLD, 14));
-        submitButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
-        submitButton.setForeground(Color.BLACK);
+        submitButton = new WoodenButton("Submit");
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -190,10 +190,7 @@ public class CirclePanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(panel.getBackground());
 
-        JButton nextButton = new JButton("Next Calculation");
-        nextButton.setFont(new Font("Arial", Font.BOLD, 14));
-        nextButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextButton.setForeground(Color.BLACK);
+        WoodenButton nextButton = new WoodenButton("Next Calculation");
         nextButton.addActionListener(new ActionListener() {
 
             @Override
@@ -256,16 +253,13 @@ public class CirclePanel extends JPanel {
     private JPanel createCompletionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 255, 240)); // Light green background
+        panel.setBackground(ColorConstants.SUCCESS_BG_COLOR); // 使用木质风格的成功背景色
 
         JLabel completionLabel = new JLabel("Great job! You've completed the Circle Calculations task!");
         completionLabel.setFont(new Font("Arial", Font.BOLD, 18));
         completionLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        JButton homeButton = new JButton("Return to Home");
-        homeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.BLACK);
+        WoodenButton homeButton = new WoodenButton("Return to Home");
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -401,7 +395,7 @@ public class CirclePanel extends JPanel {
     private void createSelectionPanel() {
         selectionPanel = new JPanel(new BorderLayout(10, 10));
         selectionPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        selectionPanel.setBackground(new Color(240, 248, 255));
+        selectionPanel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
 
         // 标题
         JLabel titleLabel = new JLabel("Choose Calculation Type");
@@ -434,11 +428,7 @@ public class CirclePanel extends JPanel {
         radioPanel.add(circumferenceRadioButton);
 
         // 确认按钮
-        JButton confirmButton = new JButton("Start Calculations");
-        confirmButton.setFont(new Font("Arial", Font.BOLD, 14));
-        confirmButton.setBackground(new Color(70, 130, 180));
-        confirmButton.setForeground(Color.BLACK);
-        // 在 createSelectionPanel() 方法中修改确认按钮的逻辑
+        WoodenButton confirmButton = new WoodenButton("Start Calculations");
         confirmButton.addActionListener(e -> {
             if (!areaRadioButton.isSelected() && !circumferenceRadioButton.isSelected()) {
                 JOptionPane.showMessageDialog(this, "Please select a calculation type!");

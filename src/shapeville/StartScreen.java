@@ -16,7 +16,10 @@ public class StartScreen extends JPanel implements KeyListener {
     private Image lockImage;
     private Image bonusImage;
     
-    // Little person properties
+    // Add navigation control flag
+    private boolean navigationTriggered = false;
+    
+    // Little person properties - start on the ground
     private int personX = 180;
     private int personY = 620;
     private int personWidth = 50;
@@ -28,6 +31,7 @@ public class StartScreen extends JPanel implements KeyListener {
     private int jumpVelocity = -15;
     private int fallVelocity = 0;
     private int gravity = 1;
+    private int groundLevel = 620; // Starting ground level
     
     // Game areas
     private Rectangle titleArea = new Rectangle(350, 320, 500, 120);
@@ -64,7 +68,7 @@ public class StartScreen extends JPanel implements KeyListener {
         // Initialize bonus button position - in bottom right corner
         // We'll set proper values after the component is shown
         bonusButtonArea = new Rectangle(1000, 700, 120, 40);
-        bonusCaveArea = new Rectangle(1000, 750, 120, 120);
+        bonusCaveArea = new Rectangle(1000, 750, 150, 150); // Larger cave area
         
         // Load images
         try {
@@ -133,12 +137,38 @@ public class StartScreen extends JPanel implements KeyListener {
                 
                 // Update bonus button location if needed
                 if (getWidth() > 0 && getHeight() > 0) {
+                    // Set the ground level to the bottom of the screen
+                    groundLevel = getHeight() - personHeight - 10;
+                    
                     int rightMargin = 30;
-                    int bottomMargin = 30;
-                    bonusButtonArea.x = getWidth() - bonusButtonArea.width - rightMargin;
-                    bonusButtonArea.y = getHeight() - bonusButtonArea.height - bonusCaveArea.height - bottomMargin;
-                    bonusCaveArea.x = bonusButtonArea.x;
-                    bonusCaveArea.y = bonusButtonArea.y + bonusButtonArea.height + 5;
+                    
+                    // Set size and position for the cave/black square - aligned with bottom
+                    bonusCaveArea.width = 180; 
+                    bonusCaveArea.height = 180;
+                    bonusCaveArea.x = getWidth() - bonusCaveArea.width - rightMargin;
+                    bonusCaveArea.y = getHeight() - bonusCaveArea.height; // Align with bottom
+                    
+                    // Position the button ABOVE the cave
+                    bonusButtonArea.width = 120;
+                    bonusButtonArea.height = 35;
+                    bonusButtonArea.x = bonusCaveArea.x + (bonusCaveArea.width - bonusButtonArea.width) / 2;
+                    bonusButtonArea.y = bonusCaveArea.y - bonusButtonArea.height - 5; // Above the cave
+                    
+                    // If person hasn't fallen yet, adjust to ground level
+                    if (!isJumping && !isFalling && personY != groundLevel) {
+                        personY = groundLevel;
+                    }
+                    
+                    // Check if person is inside the bonus cave to trigger navigation
+                    if (!navigationTriggered && !isJumping && !isFalling && 
+                        personX + personWidth > bonusCaveArea.x && 
+                        personX < bonusCaveArea.x + bonusCaveArea.width &&
+                        personY + personHeight > bonusCaveArea.y) {
+                        // Set flag to prevent repeated navigation
+                        navigationTriggered = true;
+                        // Navigate to Bonus Tasks (level 3)
+                        navigateToMainScreen(3);
+                    }
                 }
                 
                 repaint();
@@ -169,6 +199,15 @@ public class StartScreen extends JPanel implements KeyListener {
             // Apply gravity
             fallVelocity += gravity;
             personY += fallVelocity;
+            
+            // Check if we've landed on the ground
+            if (personY >= groundLevel) {
+                personY = groundLevel;
+                isJumping = false;
+                isFalling = false;
+                fallVelocity = 0;
+                jumpCount = 0;
+            }
         }
     }
     
@@ -509,11 +548,21 @@ public class StartScreen extends JPanel implements KeyListener {
     }
     
     private void drawBonusButton(Graphics2D g2d) {
-        // Draw the wooden sign for Bonus Tasks
+        // First draw the black square with orange border (cave area)
+        // Draw the black background square
+        g2d.setColor(Color.BLACK);
+        g2d.fillRoundRect(bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, 15, 15);
+        
+        // Draw the orange border
+        g2d.setColor(new Color(210, 105, 30)); // Dark orange-brown
+        g2d.setStroke(new BasicStroke(8));
+        g2d.drawRoundRect(bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, 15, 15);
+        
+        // Draw the wooden sign for Bonus Tasks ABOVE the cave
         g2d.setColor(new Color(232, 194, 145)); // Light wooden color
         g2d.fillRoundRect(bonusButtonArea.x, bonusButtonArea.y, bonusButtonArea.width, bonusButtonArea.height, 10, 10);
         
-        // Draw border
+        // Draw sign border
         g2d.setColor(new Color(160, 82, 45)); // Brown color
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(bonusButtonArea.x, bonusButtonArea.y, bonusButtonArea.width, bonusButtonArea.height, 10, 10);
@@ -522,6 +571,8 @@ public class StartScreen extends JPanel implements KeyListener {
         if (bonusButtonHover) {
             g2d.setColor(new Color(255, 255, 150, 40));
             g2d.fillRoundRect(bonusButtonArea.x, bonusButtonArea.y, bonusButtonArea.width, bonusButtonArea.height, 10, 10);
+            // Also highlight the cave area
+            g2d.fillRoundRect(bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, 15, 15);
         }
         
         // Draw text
@@ -532,25 +583,6 @@ public class StartScreen extends JPanel implements KeyListener {
         int textX = bonusButtonArea.x + (bonusButtonArea.width - metrics.stringWidth(text)) / 2;
         int textY = bonusButtonArea.y + ((bonusButtonArea.height - metrics.getHeight()) / 2) + metrics.getAscent();
         g2d.drawString(text, textX, textY);
-        
-        // Draw the cave area (dark rounded rectangle)
-        g2d.setColor(new Color(20, 20, 20));
-        g2d.fillRoundRect(bonusCaveArea.x, bonusCaveArea.y, bonusCaveArea.width, bonusCaveArea.height, 15, 15);
-        
-        // Draw the bonus image in the cave
-        if (bonusImage != null) {
-            int padding = 15;
-            int imageSize = Math.min(bonusCaveArea.width - padding*2, bonusCaveArea.height - padding*2);
-            g2d.drawImage(bonusImage,
-                    bonusCaveArea.x + padding,
-                    bonusCaveArea.y + padding,
-                    imageSize, imageSize, null);
-        } else {
-            // If image not loaded, draw placeholder
-            g2d.setColor(Color.ORANGE);
-            g2d.fillOval(bonusCaveArea.x + 20, bonusCaveArea.y + 20,
-                    bonusCaveArea.width - 40, bonusCaveArea.height - 40);
-        }
     }
     
     // Key listener methods
@@ -567,7 +599,7 @@ public class StartScreen extends JPanel implements KeyListener {
             personX += 10;
             if (personX > getWidth() - personWidth) 
                 personX = getWidth() - personWidth;
-        } else if (key == KeyEvent.VK_K) {
+        } else if (key == KeyEvent.VK_K || key == KeyEvent.VK_SPACE) {
             // Jump
             if (!isJumping && !isFalling) {
                 isJumping = true;
@@ -660,5 +692,21 @@ public class StartScreen extends JPanel implements KeyListener {
             if (alpha < 0) alpha = 0;
             if (alpha > 255) alpha = 255;
         }
+    }
+    
+    /**
+     * Reset navigation control when returning to start screen
+     */
+    public void resetNavigation() {
+        // Reset navigation flag
+        navigationTriggered = false;
+        
+        // Reset character position to starting point
+        personX = 180;
+        personY = groundLevel;
+        isJumping = false;
+        isFalling = false;
+        fallVelocity = 0;
+        jumpCount = 0;
     }
 } 

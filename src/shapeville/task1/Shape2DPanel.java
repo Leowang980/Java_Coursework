@@ -2,6 +2,8 @@ package shapeville.task1;
 import shapeville.ScoreManager;
 import shapeville.ShapevilleApp;
 import shapeville.utils.ImageProvider;
+import shapeville.utils.WoodenButton;
+import shapeville.utils.ColorConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +20,7 @@ public class Shape2DPanel extends JPanel {
 
     private JLabel shapeImageLabel;
     private JTextField answerField;
-    private JButton submitButton;
+    private WoodenButton submitButton;
     private JLabel feedbackLabel;
     private JLabel attemptsLabel;
     private JLabel progressLabel;
@@ -42,6 +44,10 @@ public class Shape2DPanel extends JPanel {
 
         // Shuffle the shapes to randomize the order
         Collections.shuffle(shapes);
+        
+        // Load previous progress and score
+        moduleScore = ScoreManager.getTask1_2dScore();
+        totalCompleted = ScoreManager.getTask1_2dProgress();
 
         // Set up the layout
         setLayout(new BorderLayout());
@@ -60,8 +66,20 @@ public class Shape2DPanel extends JPanel {
         // Show the task panel first
         cardLayout.show(contentPanel, "TASK");
 
+        // If all shapes were already answered, show completion panel
+        if (totalCompleted >= shapes.size()) {
+            cardLayout.show(contentPanel, "COMPLETION");
+            return;
+        }
+        
+        // Filter out shapes that have already been answered
+        filterAnsweredShapes();
+        
         // Display the first shape
         displayNextShape();
+        
+        // Update UI elements with saved progress
+        updateProgressUI();
     }
 
     private void initializeShapes() {
@@ -82,22 +100,22 @@ public class Shape2DPanel extends JPanel {
     }
 
     private JPanel createTaskPanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 248, 255)); // Light blue background
-
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
+        
         // Title panel
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(70, 130, 180)); // Steel blue
+        titlePanel.setBackground(ColorConstants.TITLE_BG_COLOR); // 使用木质风格的标题背景色
         JLabel titleLabel = new JLabel("Task 1: 2D Shape Identification");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
         panel.add(titlePanel, BorderLayout.NORTH);
-
-        // Center panel with the shape image
+        
+        // Center panel with shape image
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(panel.getBackground());
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
         // Shape image placeholder
         shapeImageLabel = new JLabel();
@@ -118,8 +136,9 @@ public class Shape2DPanel extends JPanel {
         // Bottom panel with input field and submit button
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(panel.getBackground());
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 50, 20, 50));
 
-        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         inputPanel.setBackground(panel.getBackground());
 
         JLabel promptLabel = new JLabel("Enter the name of this shape:");
@@ -128,7 +147,7 @@ public class Shape2DPanel extends JPanel {
         answerField = new JTextField(15);
         answerField.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        submitButton = new JButton("Submit");
+        submitButton = new WoodenButton("Submit");
         submitButton.setFont(new Font("Arial", Font.BOLD, 14));
         submitButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
         submitButton.setForeground(Color.BLACK);
@@ -181,13 +200,11 @@ public class Shape2DPanel extends JPanel {
 
         bottomPanel.add(feedbackPanel, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(panel.getBackground());
 
-        JButton nextButton = new JButton("Next Shape");
+        WoodenButton nextButton = new WoodenButton("Next Shape");
         nextButton.setFont(new Font("Arial", Font.BOLD, 14));
-        nextButton.setBackground(new Color(50, 205, 50)); // Lime green
-        nextButton.setForeground(Color.BLACK);
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -212,39 +229,32 @@ public class Shape2DPanel extends JPanel {
 
     private JPanel createCompletionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 255, 240)); // Light green background
+        panel.setBackground(ColorConstants.SUCCESS_BG_COLOR); // 使用木质风格的成功背景色
 
-        // 新增：显示本模块得分
-        JLabel completionLabel = new JLabel("Great job! You've completed the 2D Shapes Identification task!\nModule Score: " + moduleScore);
+        // 显示本模块得分
+        JLabel completionLabel = new JLabel("<html>Great job! You've completed the 2D Shapes Identification task!<br>Module Score: " + moduleScore + "</html>");
         completionLabel.setFont(new Font("Arial", Font.BOLD, 18));
         completionLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        JButton homeButton = new JButton("Return to Home");
+        WoodenButton homeButton = new WoodenButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
-        homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 完成模块时，主进度条增加
                 mainApp.returnToHome();
             }
         });
 
-        JButton goTo3DButton = new JButton("Continue to 3D Shapes");
+        WoodenButton goTo3DButton = new WoodenButton("Continue to 3D Shapes");
         goTo3DButton.setFont(new Font("Arial", Font.BOLD, 14));
-        goTo3DButton.setBackground(new Color(50, 205, 50)); // Lime green
-        goTo3DButton.setForeground(Color.BLACK);
         goTo3DButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 完成模块时，主进度条增加
                 mainApp.startTask1_3D();
             }
         });
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(panel.getBackground());
         buttonPanel.add(homeButton);
         buttonPanel.add(goTo3DButton);
@@ -256,49 +266,47 @@ public class Shape2DPanel extends JPanel {
     }
 
     private void displayNextShape() {
-        // Reset attempts
-        attempts = 0;
-        attemptsLabel.setText("Attempts: " + attempts + "/" + ScoreManager.MAX_ATTEMPTS);
-
-        // Clear feedback and answer field
-        feedbackLabel.setText(" ");
-        answerField.setText("");
-        answerField.requestFocus();
-
-        // Check if we've gone through all shapes
-        if (currentShapeIndex >= shapes.size()) {
-            // 2D模块完成时立即加进度
-            mainApp.addTask1ProgressPart(0.5);
+        if (shapes.isEmpty()) {
+            // All shapes have been answered, show completion panel
             cardLayout.show(contentPanel, "COMPLETION");
             return;
         }
 
-        // Get the current shape
-        currentShape = shapes.get(currentShapeIndex);
+        // Reset attempt count
+        attempts = 0;
+        attemptsLabel.setText("Attempts: " + attempts + "/" + ScoreManager.MAX_ATTEMPTS);
 
-        // Display the shape image using ImageProvider
+        // Get the next unanswered shape
+        currentShape = shapes.remove(0); // Get and remove first shape from list
+        
+        // Display the shape
         try {
             ImageIcon icon = ImageProvider.get2DShapeIcon(currentShape.getImagePath());
-            shapeImageLabel.setIcon(icon);
+            if (icon != null) {
+                shapeImageLabel.setIcon(icon);
+            } else {
+                shapeImageLabel.setText("Image not found: " + currentShape.getImagePath());
+            }
         } catch (Exception e) {
-            System.err.println("Could not load image for shape: " + currentShape.getName());
+            shapeImageLabel.setText("Error loading image");
             e.printStackTrace();
-            // Use a placeholder if the image couldn't be loaded
-            shapeImageLabel.setIcon(null);
-            shapeImageLabel.setText("Shape: " + currentShape.getName());
         }
 
-        // Update progress
-        progressLabel.setText("Progress: " + totalCompleted + "/" + shapes.size());
-        // 更新模块进度条
+        // Clear feedback and input
+        feedbackLabel.setText(" ");
+        answerField.setText("");
+        answerField.requestFocus();
+        answerField.setEnabled(true);
+        submitButton.setEnabled(true);
+
+        // Update progress display
         moduleProgressBar.setValue(totalCompleted);
-        moduleProgressBar.setString(totalCompleted + "/" + shapes.size());
-        // 更新模块分数显示
-        moduleScoreLabel.setText("Module Score: " + moduleScore);
+        moduleProgressBar.setString(totalCompleted + "/11");
     }
 
     private void checkAnswer() {
         String userAnswer = answerField.getText().trim().toLowerCase();
+        String correctAnswer = currentShape.getName().toLowerCase();
 
         if (userAnswer.isEmpty()) {
             feedbackLabel.setText("Please enter an answer!");
@@ -309,23 +317,38 @@ public class Shape2DPanel extends JPanel {
         attempts++;
         attemptsLabel.setText("Attempts: " + attempts + "/" + ScoreManager.MAX_ATTEMPTS);
 
-        if (userAnswer.equals(currentShape.getName())) {
+        if (userAnswer.equals(correctAnswer)) {
             // Correct answer
             int score = ScoreManager.calculateScore(false, attempts); // Basic level
+            moduleScore += score; // Add to module score
+            ScoreManager.addToTask1_2dScore(score); // Persist module score
+            
             String feedback = ScoreManager.getFeedbackMessage(score);
-
             feedbackLabel.setText("Correct! " + feedback + " +" + score + " points");
             feedbackLabel.setForeground(new Color(0, 128, 0)); // Dark green
 
             // Update score in main app
             mainApp.updateScore(score);
-            // 新增：更新模块分数
-            moduleScore += score;
-            moduleScoreLabel.setText("Module Score: " + moduleScore);
+            
+            // Mark this shape as completed
+            ScoreManager.markShape2DAnswered(currentShape.getName());
+            totalCompleted = ScoreManager.getTask1_2dProgress();
 
-            // Disable input until next shape
+            // Disable input fields
             answerField.setEnabled(false);
             submitButton.setEnabled(false);
+
+            // Update progress display
+            updateProgressUI();
+
+            // Check if all shapes are completed
+            if (shapes.isEmpty() || totalCompleted >= 11) { // 11 is the total number of shapes
+                // Mark task as completed
+                mainApp.addTask1ProgressPart(0.5);
+                
+                // Show completion panel
+                cardLayout.show(contentPanel, "COMPLETION");
+            }
         } else {
             // Wrong answer
             feedbackLabel.setText("That's not correct. Try again!");
@@ -333,13 +356,47 @@ public class Shape2DPanel extends JPanel {
 
             // If max attempts reached, show correct answer
             if (attempts >= ScoreManager.MAX_ATTEMPTS) {
-                feedbackLabel.setText("The correct answer is: " + currentShape.getName());
-
-                // Disable input until next shape
+                feedbackLabel.setText("The correct answer is: " + correctAnswer);
                 answerField.setEnabled(false);
                 submitButton.setEnabled(false);
+
+                // 新增：答错也记录
+                ScoreManager.markShape2DAnswered(currentShape.getName());
+                totalCompleted = ScoreManager.getTask1_2dProgress();
+                updateProgressUI();
+
+                // 检查是否全部完成
+                if (shapes.isEmpty() || totalCompleted >= 11) {
+                    mainApp.addTask1ProgressPart(0.5);
+                    cardLayout.show(contentPanel, "COMPLETION");
+                }
             }
         }
+
+        // Update the module score label
+        moduleScoreLabel.setText("Module Score: " + moduleScore);
+    }
+
+    private void filterAnsweredShapes() {
+        // Create a temporary list to hold unanswered shapes
+        List<Shape2D> unansweredShapes = new ArrayList<>();
+        
+        for (Shape2D shape : shapes) {
+            if (!ScoreManager.isShape2DAnswered(shape.getName())) {
+                unansweredShapes.add(shape);
+            }
+        }
+        
+        // Replace the original list with the filtered list
+        shapes = unansweredShapes;
+    }
+    
+    private void updateProgressUI() {
+        // Update progress and score displays
+        progressLabel.setText("Progress: " + totalCompleted + "/" + 11); // Total shapes is 11
+        moduleScoreLabel.setText("Module Score: " + moduleScore);
+        moduleProgressBar.setValue(totalCompleted);
+        moduleProgressBar.setString(totalCompleted + "/11");
     }
 
     // Inner class to represent a 2D shape

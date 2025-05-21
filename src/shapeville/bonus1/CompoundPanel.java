@@ -2,6 +2,8 @@ package shapeville.bonus1;
 
 import shapeville.ScoreManager;
 import shapeville.ShapevilleApp;
+import shapeville.utils.WoodenButton;
+import shapeville.utils.ColorConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +39,7 @@ public class CompoundPanel extends JPanel {
     //private JPanel practicePanel; // Panel for practice interface
     private JLabel promptLabel, attemptsLabel, progressLabel, timerLabel, feedbackLabel;
     private JTextField areaField, perimeterField;
-    private JButton submitButton, homeButton, nextButton;
+    private WoodenButton submitButton, homeButton, nextButton;
     private JPanel mainPanel;
     private DecimalFormat df = new DecimalFormat("0.00");
 
@@ -74,7 +76,8 @@ public class CompoundPanel extends JPanel {
         removeAll();
         
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(255, 250, 240));
+        panel.setBackground(ColorConstants.BONUS_BG_COLOR);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         // Title
         JLabel title = new JLabel("Bonus 1: Select a Compound to Practice");
@@ -126,8 +129,7 @@ public class CompoundPanel extends JPanel {
         
         // If all sectors are completed, show return to home button
         if (allCompleted) {
-            JButton homeButton = new JButton("Return to Home");
-            homeButton.addActionListener(e -> returnToHomeWithProgress());
+            homeButton = new WoodenButton("Return to Home");
             mainApp.updateProgress(100.0/6);
             JPanel buttonPanel = new JPanel();
             buttonPanel.setBackground(panel.getBackground());
@@ -158,7 +160,7 @@ public class CompoundPanel extends JPanel {
         panel.setBackground(new Color(255, 250, 240));
         panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         
-        JButton button = new JButton(scaledIcon);
+        JButton button = new WoodenButton("");
         if (!completedSectors[index]) {
             button.addActionListener(new ActionListener() {
                 @Override
@@ -185,7 +187,7 @@ public class CompoundPanel extends JPanel {
     private JPanel createMainPanel() {
         mainPanel = new JPanel(new BorderLayout(0, 0));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        mainPanel.setBackground(new Color(255, 250, 240));
+        mainPanel.setBackground(ColorConstants.BONUS_BG_COLOR);
 
         JLabel title = new JLabel("Bonus 1: Compound Area & Perimeter");
         title.setFont(new Font("Arial", Font.BOLD, 20));
@@ -245,14 +247,9 @@ public class CompoundPanel extends JPanel {
         perimeterField.setAlignmentX(Component.CENTER_ALIGNMENT);
         
 
-        submitButton = new JButton("Submit");
-        submitButton.setFont(new Font("Arial", Font.BOLD, 14));
-        submitButton.setBackground(new Color(255, 0, 0)); // Red background
-        submitButton.setForeground(Color.WHITE); // White text
+        submitButton = new WoodenButton("Submit");
         submitButton.setFocusPainted(false);
-        submitButton.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        submitButton.setOpaque(true); // 确保背景色可见
-        submitButton.setBorderPainted(false); // 移除边框
+        submitButton.setBorderPainted(false);
         submitButton.addActionListener(e -> checkAnswer());
         inputPanel.add(submitButton);
         
@@ -302,11 +299,7 @@ public class CompoundPanel extends JPanel {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         btnPanel.setBackground(mainPanel.getBackground());
 
-        nextButton = new JButton("Next");
-        nextButton.setFont(new Font("Arial", Font.BOLD, 14));
-        nextButton.setBackground(new Color(50, 205, 50));
-        nextButton.setForeground(Color.BLACK);
-        nextButton.setFocusPainted(false);
+        nextButton = new WoodenButton("Next");
         nextButton.setEnabled(false);
         nextButton.addActionListener(e -> nextSector());
         btnPanel.add(nextButton);
@@ -458,13 +451,12 @@ public class CompoundPanel extends JPanel {
         removeAll();
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 255, 240));
+        panel.setBackground(ColorConstants.SUCCESS_BG_COLOR);
         JLabel label = new JLabel("Congratulations! All compounds completed!");
         label.setFont(new Font("Arial", Font.BOLD, 18));
         label.setHorizontalAlignment(JLabel.CENTER);
         panel.add(label, BorderLayout.CENTER);
-        JButton homeBtn = new JButton("Home");
-        homeBtn.setFont(new Font("Arial", Font.BOLD, 14));
+        WoodenButton homeBtn = new WoodenButton("Home");
         homeBtn.setBackground(new Color(70, 130, 180));
         homeBtn.setForeground(Color.WHITE);
         homeBtn.setFocusPainted(false);

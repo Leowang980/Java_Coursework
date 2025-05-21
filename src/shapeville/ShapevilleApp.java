@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import shapeville.utils.WoodenButton;
+import shapeville.utils.ColorConstants;
 
 public class ShapevilleApp extends JFrame {
     private JPanel contentPanel;
@@ -59,6 +61,32 @@ public class ShapevilleApp extends JFrame {
         setSize(1200, 800);
         setLocationRelativeTo(null);
         
+        // Initialize from persisted state in ScoreManager
+        totalScore = ScoreManager.getScore();
+        task1_2dCompleted = ScoreManager.isTask1_2dCompleted();
+        task1_3dCompleted = ScoreManager.isTask1_3dCompleted();
+        task2Completed = ScoreManager.isTask2Completed();
+        task3Completed = ScoreManager.isTask3Completed();
+        task4Completed = ScoreManager.isTask4Completed();
+        bonus1Completed = ScoreManager.isBonus1Completed();
+        bonus2Completed = ScoreManager.isBonus2Completed();
+        
+        // 修复计算总进度的逻辑，确保总共6个模块
+        double completedTasks = 0.0;
+        // Task1包括2D和3D两部分，各占0.5
+        if (task1_2dCompleted) completedTasks += 0.5;
+        if (task1_3dCompleted) completedTasks += 0.5;
+        // 其他任务各占1
+        if (task2Completed) completedTasks += 1.0;
+        if (task3Completed) completedTasks += 1.0;
+        if (task4Completed) completedTasks += 1.0;
+        if (bonus1Completed) completedTasks += 1.0;
+        if (bonus2Completed) completedTasks += 1.0;
+        
+        // 确保总共6个模块的进度
+        progress_total = (completedTasks / 6.0) * 100.0;
+        totalProgress = (int)Math.round(progress_total);
+        
         // Initialize the layout
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
@@ -82,20 +110,27 @@ public class ShapevilleApp extends JFrame {
         JPanel navPanel = createNavigationPanel();
         add(navPanel, BorderLayout.SOUTH);
         
+        // 确保进度条显示正确的值
+        progressBar.setValue((int)Math.round(progress_total));
+        progressBar.setString((int)Math.round(progress_total) + "%");
+        
         // Show start screen by default
         cardLayout.show(contentPanel, START_SCREEN);
         
         // Hide the progress bar initially (will show only in home screen)
         navPanel.setVisible(false);
+        
+        // Update score display
+        scoreLabel.setText("Score: " + totalScore);
     }
     
     private JPanel createHomePanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(240, 248, 255)); // Light blue background
+        panel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
         
         // Title panel
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(70, 130, 180)); // Steel blue
+        titlePanel.setBackground(ColorConstants.TITLE_BG_COLOR); // 使用木质风格的标题背景色
         JLabel titleLabel = new JLabel("Welcome to Shapeville!");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
@@ -105,7 +140,7 @@ public class ShapevilleApp extends JFrame {
         // Center panel with task buttons
         JPanel centerPanel = new JPanel(new GridLayout(3, 2, 20, 20));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        centerPanel.setBackground(new Color(240, 248, 255));
+        centerPanel.setBackground(ColorConstants.MAIN_BG_COLOR);
         
         // Add task buttons with lock status based on access level
         addTaskButton(centerPanel, "Task 1: Shape Identification", "Learn to identify 2D and 3D shapes", e -> startTask1(), 1);
@@ -119,29 +154,36 @@ public class ShapevilleApp extends JFrame {
         
         // Game info panel
         JPanel infoPanel = new JPanel(new BorderLayout());
-        infoPanel.setBackground(new Color(240, 248, 255));
+        infoPanel.setBackground(ColorConstants.MAIN_BG_COLOR);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         
-        JLabel infoLabel = new JLabel("<html><h3>Game Levels and Scoring:</h3>" +
-                "Basic level: 3 points (1st attempt), 2 points (2nd attempt), 1 point (3rd attempt)<br>" +
-                "Advanced level: 6 points (1st attempt), 4 points (2nd attempt), 2 points (3rd attempt)</html>");
-        infoLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        // 使用普通文本而不是HTML
+        JLabel infoLabel = new JLabel("Game Levels and Scoring:");
+        infoLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        infoPanel.add(infoLabel, BorderLayout.NORTH);
         
-        infoPanel.add(infoLabel, BorderLayout.CENTER);
+        // 添加详细信息
+        JPanel detailsPanel = new JPanel(new GridLayout(2, 1));
+        detailsPanel.setBackground(infoPanel.getBackground());
+        
+        JLabel basicLabel = new JLabel("Basic level: 3 points (1st attempt), 2 points (2nd attempt), 1 point (3rd attempt)");
+        basicLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        
+        JLabel advancedLabel = new JLabel("Advanced level: 6 points (1st attempt), 4 points (2nd attempt), 2 points (3rd attempt)");
+        advancedLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        
+        detailsPanel.add(basicLabel);
+        detailsPanel.add(advancedLabel);
+        infoPanel.add(detailsPanel, BorderLayout.CENTER);
+        
         panel.add(infoPanel, BorderLayout.SOUTH);
         
         return panel;
     }
     
     private void addTaskButton(JPanel panel, String title, String description, ActionListener action, int requiredLevel) {
-        JButton button = new JButton("<html><center>" + title + "<br><font size='-1'>" + description + "</font></center></html>");
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(135, 206, 250)); // Light sky blue
-        button.setForeground(new Color(25, 25, 112)); // Midnight blue
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(70, 130, 180), 2),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        // 使用新的WoodenButton构造函数，分别传递标题和描述
+        JButton button = new WoodenButton(title, description);
         
         // Add button with action if accessible based on access level
         if (accessLevel >= requiredLevel) {
@@ -154,15 +196,12 @@ public class ShapevilleApp extends JFrame {
                 Image scaledImage = lockIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
                 lockIcon = new ImageIcon(scaledImage);
                 
-                button.setText("<html><center>" + title + "<br><font size='-1'>" + description + 
-                        "</font></center></html>");
                 button.setIcon(lockIcon);
                 button.setEnabled(false);
                 button.setDisabledIcon(lockIcon);
             } catch (Exception e) {
                 // If lock icon cannot be loaded, just use text
-                button.setText("<html><center>" + title + "<br><font size='-1'>" + description + 
-                        "</font><br><font color='red'>(🔒 Locked)</font></center></html>");
+                ((WoodenButton)button).setDescription(description + " (🔒 Locked)");
                 button.setEnabled(false);
             }
         }
@@ -173,14 +212,15 @@ public class ShapevilleApp extends JFrame {
     private JPanel createNavigationPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        panel.setBackground(new Color(230, 230, 250)); // Lavender
+        panel.setBackground(ColorConstants.NAV_BG_COLOR); // 使用木质风格的导航背景色
         
         // Progress bar
         progressBar = new JProgressBar(0, 100);
-        progressBar.setValue(0);
+        progressBar.setValue((int)Math.round(progress_total));
         progressBar.setStringPainted(true);
+        progressBar.setString((int)Math.round(progress_total) + "%");
         progressBar.setBackground(Color.WHITE);
-        progressBar.setForeground(new Color(50, 205, 50)); // Lime green
+        progressBar.setForeground(ColorConstants.WOOD_BORDER_COLOR); // 使用边框颜色作为进度条颜色
         
         // Score label
         scoreLabel = new JLabel("Score: 0");
@@ -195,13 +235,13 @@ public class ShapevilleApp extends JFrame {
         rightPanel.setBackground(panel.getBackground());
         rightPanel.add(scoreLabel);
         
-        JButton backButton = new JButton("Back to Start");
+        JButton backButton = new WoodenButton("Back to Start");
         backButton.addActionListener(e -> returnToStartScreen());
         
-        JButton homeButton = new JButton("Home");
+        JButton homeButton = new WoodenButton("Home");
         homeButton.addActionListener(e -> returnToHome());
         
-        JButton endButton = new JButton("End Session");
+        JButton endButton = new WoodenButton("End Session");
         endButton.addActionListener(e -> endSession());
         
         rightPanel.add(backButton);
@@ -257,15 +297,36 @@ public class ShapevilleApp extends JFrame {
     }
     
     public void returnToHome() {
+        // Clear cached panels to fix re-entry bug
+        shape2DPanel = null;
+        shape3DPanel = null;
+        anglePanel = null;
+        areaPanel = null;
+        circlePanel = null;
+        sectorPanel = null;
+        compoundPanel = null;
+        
         startHomeScreen();
     }
     
     public void returnToStartScreen() {
+        // Clear cached panels to fix re-entry bug
+        shape2DPanel = null;
+        shape3DPanel = null;
+        anglePanel = null;
+        areaPanel = null;
+        circlePanel = null;
+        sectorPanel = null;
+        compoundPanel = null;
+        
         // Hide navigation panel
         getContentPane().getComponent(1).setVisible(false);
         
         // Show start screen
         cardLayout.show(contentPanel, START_SCREEN);
+        
+        // Reset navigation controls in StartScreen
+        startScreen.resetNavigation();
         
         // Request focus for the start screen to capture key events
         startScreen.requestFocusInWindow();
@@ -374,7 +435,9 @@ public class ShapevilleApp extends JFrame {
     public void updateProgress(double progress) {
         progress_total += progress;
         System.out.println("progress_total: " + progress_total);
-        progressBar.setValue((int)Math.round(progress_total));
+        int progressValue = (int)Math.round(progress_total);
+        progressBar.setValue(progressValue);
+        progressBar.setString(progressValue + "%");
     }
     
     public static void main(String[] args) {
@@ -397,88 +460,119 @@ public class ShapevilleApp extends JFrame {
      * Task1子模块完成时调用，part=0.5表示2D或3D各占一半
      */
     public void addTask1ProgressPart(double part) {
-        double increment = 100.0 / 6 * part; // 1/12=8.33...%
-        if (part == 0.5) {
-            if (!task1_2dCompleted) {
-                totalProgress += (int)Math.round(increment);
+        double increment = 100.0 / 6.0 * part; // 每个模块占16.67%
+        if (part == 0.5) { // 2D或3D部分完成
+            if (!task1_2dCompleted && part == 0.5) {
                 task1_2dCompleted = true;
+                ScoreManager.setTask1_2dCompleted(true);
                 progress_total += increment;
-                System.out.println("progress_total: " + progress_total);
+                System.out.println("Task1 2D完成: progress_total = " + progress_total);
                 progressBar.setValue((int)Math.round(progress_total));
-            }
-        } else if (part == 1.5) { // 备用：全部完成
-            if (!task1_2dCompleted || !task1_3dCompleted) {
-                totalProgress += increment * 2;
-                task1_2dCompleted = true;
-                task1_3dCompleted = true;
-                progress_total += increment * 2;
-                progressBar.setValue((int)Math.round(progress_total));
+                progressBar.setString((int)Math.round(progress_total) + "%");
             }
         }
     }
+    
     public void addTask1Progress3DPart() {
-        double increment = 100.0 / 6 * 0.5;
+        double increment = 100.0 / 6.0 * 0.5; // 3D部分占总进度的8.33%
         if (!task1_3dCompleted) {
-            totalProgress += (int)Math.round(increment);
             task1_3dCompleted = true;
+            ScoreManager.setTask1_3dCompleted(true);
             progress_total += increment;
-            System.out.println("progress_total: " + progress_total);
+            System.out.println("Task1 3D完成: progress_total = " + progress_total);
             progressBar.setValue((int)Math.round(progress_total));
+            progressBar.setString((int)Math.round(progress_total) + "%");
         }
     }
-    public boolean isTask1_2dCompleted() { return task1_2dCompleted; }
-    public boolean isTask1_3dCompleted() { return task1_3dCompleted; }
+    
+    public boolean isTask1_2dCompleted() { 
+        return task1_2dCompleted || ScoreManager.isTask1_2dCompleted(); 
+    }
+    
+    public boolean isTask1_3dCompleted() { 
+        return task1_3dCompleted || ScoreManager.isTask1_3dCompleted();
+    }
     
     // 统一进度加分方法
     public void addTask2Progress() {
-        double increment = 100.0 / 6;
+        double increment = 100.0 / 6.0; // 每个模块占16.67%
         if (!task2Completed) {
-            totalProgress += (int)Math.round(increment);
             task2Completed = true;
+            ScoreManager.setTask2Completed(true);
             progress_total += increment;
-            System.out.println("progress_total: " + progress_total);
+            System.out.println("Task2完成: progress_total = " + progress_total);
             progressBar.setValue((int)Math.round(progress_total));
+            progressBar.setString((int)Math.round(progress_total) + "%");
         }
     }
+    
     public void addTask3Progress() {
-        int increment = 100 / 6;
+        double increment = 100.0 / 6.0;
         if (!task3Completed) {
-            totalProgress += increment;
             task3Completed = true;
-            progressBar.setValue(progressBar.getValue()+increment);
-        }
-    }
-    public void addTask4Progress() {
-        double increment = 100.0 / 6;
-        if (!task4Completed) {
-            totalProgress += (int)Math.round(increment);
-            task4Completed = true;
+            ScoreManager.setTask3Completed(true);
             progress_total += increment;
-            System.out.println("progress_total: " + progress_total);
+            System.out.println("Task3完成: progress_total = " + progress_total);
             progressBar.setValue((int)Math.round(progress_total));
+            progressBar.setString((int)Math.round(progress_total) + "%");
         }
     }
+    
+    public void addTask4Progress() {
+        double increment = 100.0 / 6.0;
+        if (!task4Completed) {
+            task4Completed = true;
+            ScoreManager.setTask4Completed(true);
+            progress_total += increment;
+            System.out.println("Task4完成: progress_total = " + progress_total);
+            progressBar.setValue((int)Math.round(progress_total));
+            progressBar.setString((int)Math.round(progress_total) + "%");
+        }
+    }
+    
     public void addBonus1Progress() {
-        int increment = 100 / 6;
+        double increment = 100.0 / 6.0;
         if (!bonus1Completed) {
-            totalProgress += increment;
             bonus1Completed = true;
-            progressBar.setValue(progressBar.getValue()+increment);
+            ScoreManager.setBonus1Completed(true);
+            progress_total += increment;
+            System.out.println("Bonus1完成: progress_total = " + progress_total);
+            progressBar.setValue((int)Math.round(progress_total));
+            progressBar.setString((int)Math.round(progress_total) + "%");
         }
     }
+    
     public void addBonus2Progress() {
-        int increment = 100 / 6;
+        double increment = 100.0 / 6.0;
         if (!bonus2Completed) {
-            totalProgress += increment;
             bonus2Completed = true;
-            progressBar.setValue(progressBar.getValue()+increment);
+            ScoreManager.setBonus2Completed(true);
+            progress_total += increment;
+            System.out.println("Bonus2完成: progress_total = " + progress_total);
+            progressBar.setValue((int)Math.round(progress_total));
+            progressBar.setString((int)Math.round(progress_total) + "%");
         }
     }
-    public boolean isTask2Completed() { return task2Completed; }
-    public boolean isTask3Completed() { return task3Completed; }
-    public boolean isTask4Completed() { return task4Completed; }
-    public boolean isBonus1Completed() { return bonus1Completed; }
-    public boolean isBonus2Completed() { return bonus2Completed; }
+    
+    public boolean isTask2Completed() { 
+        return task2Completed || ScoreManager.isTask2Completed(); 
+    }
+    
+    public boolean isTask3Completed() { 
+        return task3Completed || ScoreManager.isTask3Completed(); 
+    }
+    
+    public boolean isTask4Completed() { 
+        return task4Completed || ScoreManager.isTask4Completed(); 
+    }
+    
+    public boolean isBonus1Completed() { 
+        return bonus1Completed || ScoreManager.isBonus1Completed(); 
+    }
+    
+    public boolean isBonus2Completed() { 
+        return bonus2Completed || ScoreManager.isBonus2Completed(); 
+    }
     
     // Set access level based on start screen selection
     public void setAccessLevel(int level) {

@@ -2,6 +2,8 @@ package shapeville.task3;
 
 import shapeville.ScoreManager;
 import shapeville.ShapevilleApp;
+import shapeville.utils.WoodenButton;
+import shapeville.utils.ColorConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +22,7 @@ public class AreaPanel extends JPanel {
 
     private ShapeAreaDisplay shapeDisplay;
     private JTextField answerField;
-    private JButton submitButton;
+    private WoodenButton submitButton;
     private JLabel feedbackLabel;
     private JLabel attemptsLabel;
     private JLabel timerLabel; // 移除了 progressLabel
@@ -39,7 +41,7 @@ public class AreaPanel extends JPanel {
     
     // 新增：跟踪每个形状的完成状态
     private boolean[] shapeCompleted = new boolean[4];
-    private JButton[] shapeButtons = new JButton[4];
+    private WoodenButton[] shapeButtons = new WoodenButton[4];
 
     public AreaPanel(ShapevilleApp mainApp) {
         this.mainApp = mainApp;
@@ -47,6 +49,8 @@ public class AreaPanel extends JPanel {
         this.contentPanel = new JPanel(cardLayout);
 
         initializeShapes();
+        // 过滤已答过的题目
+        filterAnsweredShapes();
         setLayout(new BorderLayout());
 
         // 添加选择界面
@@ -70,7 +74,7 @@ public class AreaPanel extends JPanel {
     private JPanel createSelectionPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 248, 255)); // 浅蓝色背景
+        panel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
 
         // 标题标签
         JLabel titleLabel = new JLabel("Select a Shape to Practice");
@@ -98,12 +102,7 @@ public class AreaPanel extends JPanel {
         String[] shapeNames = {"Rectangle", "Parallelogram", "Triangle", "Trapezium"};
         for (int i = 0; i < shapeNames.length; i++) {
             final int index = i;
-            JButton shapeButton = new JButton(shapeNames[i]);
-            shapeButton.setFont(new Font("Arial", Font.BOLD, 20));
-            shapeButton.setForeground(Color.BLACK);
-            shapeButton.setPreferredSize(new Dimension(200, 80));
-            shapeButton.setMinimumSize(new Dimension(200, 80));
-            shapeButton.setMaximumSize(new Dimension(200, 80));
+            WoodenButton shapeButton = new WoodenButton(shapeNames[i]);
             
             // 保存按钮引用
             shapeButtons[i] = shapeButton;
@@ -112,9 +111,9 @@ public class AreaPanel extends JPanel {
             if (shapeCompleted[i]) {
                 shapeButton.setEnabled(false);
                 shapeButton.setText(shapeNames[i] + " ✓");
-                shapeButton.setBackground(new Color(144, 238, 144)); // 浅绿色表示完成
+                shapeButton.setBackground(ColorConstants.TASK_COMPLETED_COLOR); // 使用完成任务的颜色
             } else {
-                shapeButton.setBackground(new Color(70, 130, 180)); // 未完成时使用原来的颜色
+                shapeButton.setBackground(ColorConstants.FUNC_BUTTON_BG); // 使用功能按钮的颜色
             }
             
             shapeButton.setFocusPainted(false);
@@ -182,11 +181,11 @@ public class AreaPanel extends JPanel {
     private JPanel createTaskPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 248, 255)); // Light blue background
+        panel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
 
         // Title panel
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(70, 130, 180)); // Steel blue
+        titlePanel.setBackground(ColorConstants.TITLE_BG_COLOR); // 使用木质风格的标题背景色
         JLabel titleLabel = new JLabel("Task 3: Area Calculation");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
@@ -218,9 +217,8 @@ public class AreaPanel extends JPanel {
         answerField = new JTextField(15);
         answerField.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        submitButton = new JButton("Submit");
+        submitButton = new WoodenButton("Submit");
         submitButton.setFont(new Font("Arial", Font.BOLD, 14));
-        submitButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
         submitButton.setForeground(Color.BLACK);
         submitButton.addActionListener(e -> checkAnswer());
 
@@ -258,9 +256,8 @@ public class AreaPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(panel.getBackground());
 
-        JButton backButton = new JButton("Back to Selection");
+        WoodenButton backButton = new WoodenButton("Back to Selection");
         backButton.setFont(new Font("Arial", Font.BOLD, 14));
-        backButton.setBackground(new Color(50, 205, 50)); // Lime green
         backButton.setForeground(Color.BLACK);
         backButton.addActionListener(e -> {
             if (countdownTimer != null) {
@@ -292,15 +289,14 @@ public class AreaPanel extends JPanel {
     private JPanel createCompletionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(240, 255, 240)); // Light green background
+        panel.setBackground(ColorConstants.SUCCESS_BG_COLOR); // 使用木质风格的成功背景色
 
         JLabel completionLabel = new JLabel("Excellent! You've completed the Area Calculation task!");
         completionLabel.setFont(new Font("Arial", Font.BOLD, 18));
         completionLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        JButton homeButton = new JButton("Return to Home");
+        WoodenButton homeButton = new WoodenButton("Return to Home");
         homeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        homeButton.setBackground(new Color(70, 130, 180)); // Steel blue
         homeButton.setForeground(Color.BLACK);
         homeButton.addActionListener(new ActionListener() {
             @Override
@@ -313,9 +309,8 @@ public class AreaPanel extends JPanel {
             }
         });
 
-        JButton nextTaskButton = new JButton("Go to Task 4: Circle Calculations");
+        WoodenButton nextTaskButton = new WoodenButton("Go to Task 4: Circle Calculations");
         nextTaskButton.setFont(new Font("Arial", Font.BOLD, 14));
-        nextTaskButton.setBackground(new Color(50, 205, 50)); // Lime green
         nextTaskButton.setForeground(Color.BLACK);
         nextTaskButton.addActionListener(new ActionListener() {
             @Override
@@ -467,6 +462,10 @@ public class AreaPanel extends JPanel {
             // Update score in main app
             mainApp.updateScore(score);
 
+            // 记录已答
+            ScoreManager.markTask3Answered(currentShape.getName());
+            totalCompleted = ScoreManager.getTask3Progress();
+
             // 更新完成状态
             int shapeIndex = getShapeIndex(currentShape.getName());
             if (shapeIndex != -1) {
@@ -509,6 +508,10 @@ public class AreaPanel extends JPanel {
                 answerField.setEnabled(false);
                 submitButton.setEnabled(false);
 
+                // 记录已答
+                ScoreManager.markTask3Answered(currentShape.getName());
+                totalCompleted = ScoreManager.getTask3Progress();
+
                 // 更新完成状态
                 int shapeIndex = getShapeIndex(currentShape.getName());
                 if (shapeIndex != -1) {
@@ -539,6 +542,17 @@ public class AreaPanel extends JPanel {
             }
         }
         return -1;
+    }
+
+    // 新增：过滤已答过的题目
+    private void filterAnsweredShapes() {
+        List<GeometricShape> unanswered = new ArrayList<>();
+        for (GeometricShape shape : shapes) {
+            if (!ScoreManager.isTask3Answered(shape.getName())) {
+                unanswered.add(shape);
+            }
+        }
+        shapes = unanswered;
     }
 
     // Inner class to display geometric shapes with their parameters
