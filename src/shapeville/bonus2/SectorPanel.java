@@ -133,6 +133,7 @@ public class SectorPanel extends JPanel {
             JPanel buttonPanel = new JPanel();
             buttonPanel.setBackground(panel.getBackground());
             buttonPanel.add(homeButton);
+            mainApp.updateProgress(100.0/6);
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
         
@@ -748,9 +749,6 @@ public class SectorPanel extends JPanel {
 
     // 添加一个新方法来处理返回主页
     private void returnToHomeWithProgress() {
-        if (isAllSectorsCompleted()) {
-            mainApp.updateProgress(100.0/6); // Bonus2 完成时更新主进度条
-        }
         mainApp.returnToHome();
     }
 

@@ -269,7 +269,7 @@ public class CirclePanel extends JPanel {
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainApp.addTask4Progress();
+                //mainApp.addTask4Progress();
                 mainApp.returnToHome();
             }
         });
@@ -376,8 +376,8 @@ public class CirclePanel extends JPanel {
             if (countdownTimer != null) {
                 countdownTimer.stop();
             }
-            int progress = 100/6;
-            //mainApp.updateProgress(progress);
+
+            mainApp.updateProgress(100.0/6);
             cardLayout.show(contentPanel, "COMPLETION");
             return;
         }

@@ -128,6 +128,7 @@ public class CompoundPanel extends JPanel {
         if (allCompleted) {
             JButton homeButton = new JButton("Return to Home");
             homeButton.addActionListener(e -> returnToHomeWithProgress());
+            mainApp.updateProgress(100.0/6);
             JPanel buttonPanel = new JPanel();
             buttonPanel.setBackground(panel.getBackground());
             buttonPanel.add(homeButton);
@@ -645,9 +646,7 @@ public class CompoundPanel extends JPanel {
 
     // 添加一个新方法来处理返回主页
     private void returnToHomeWithProgress() {
-        if (isAllCompoundsCompleted()) {
-            mainApp.updateProgress(100.0 / 6); // Bonus2 完成时更新主进度条
-        }
+        
         mainApp.returnToHome();
     }
 
@@ -658,6 +657,7 @@ public class CompoundPanel extends JPanel {
             if (!completed) return false;
         }
         hasCompletedAllSectors = true; // 记住完成状态
+        System.out.println("isAllCompoundsCompleted: " + hasCompletedAllSectors);
         return true;
     }
 

@@ -99,8 +99,11 @@ public class AreaPanel extends JPanel {
         for (int i = 0; i < shapeNames.length; i++) {
             final int index = i;
             JButton shapeButton = new JButton(shapeNames[i]);
-            shapeButton.setFont(new Font("Arial", Font.BOLD, 16));
+            shapeButton.setFont(new Font("Arial", Font.BOLD, 20));
             shapeButton.setForeground(Color.BLACK);
+            shapeButton.setPreferredSize(new Dimension(200, 80));
+            shapeButton.setMinimumSize(new Dimension(200, 80));
+            shapeButton.setMaximumSize(new Dimension(200, 80));
             
             // 保存按钮引用
             shapeButtons[i] = shapeButton;
@@ -265,6 +268,7 @@ public class AreaPanel extends JPanel {
             }
             System.out.println("totalCompleted: " + totalCompleted);
             if (totalCompleted == 4) {
+                mainApp.updateProgress(100.0/6);
                 cardLayout.show(contentPanel, "COMPLETION");
             }else{
             shapeDisplay.setShowSolution(false);
@@ -303,7 +307,7 @@ public class AreaPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 if (haveAddedProgress) {
                     haveAddedProgress = false;
-                    mainApp.updateProgress(100.0/6);
+                    //mainApp.updateProgress(100.0/6);
                 }
                 mainApp.returnToHome();
             }
@@ -318,7 +322,7 @@ public class AreaPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 if (haveAddedProgress) {
                     haveAddedProgress = false;
-                    mainApp.updateProgress(100.0/6);
+                    //mainApp.updateProgress(100.0/6);
                 }
                 mainApp.startTask4();
             }
