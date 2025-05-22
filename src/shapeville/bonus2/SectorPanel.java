@@ -16,35 +16,79 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Bonus2 扇形面积与周长练习面板
- * Sector Area & Perimeter Practice Panel
+ * A panel for Bonus 2: Sector Area & Perimeter Practice in the Shapeville application.
+ * <p>
+ * This panel allows users to practice calculating the area and perimeter of sectors,
+ * provides interactive feedback, tracks progress and attempts, and integrates with the main application.
+ * </p>
  */
 public class SectorPanel extends JPanel {
+    /** Reference to the main application instance */
     private final ShapevilleApp mainApp;
-    private final List<SectorData> sectors; // 8个扇形数据
-    private int currentIndex = -1; // Changed to -1 to indicate no sector selected
+    /** List of sector data for the practice */
+    private final List<SectorData> sectors;
+    /** Index of the current sector being practiced */
+    private int currentIndex = -1;
+    /** Number of attempts for the current sector */
     private int attempts = 0;
+    /** Number of completed sectors */
     private int completed = 0;
+    /** Total number of sectors */
     private static final int TOTAL = 8;
+    /** Maximum number of attempts allowed */
     private static final int MAX_ATTEMPTS = ScoreManager.MAX_ATTEMPTS;
-    private static final int TIME_LIMIT = 300; // 5分钟，单位秒
+    /** Time limit for each sector (in seconds) */
+    private static final int TIME_LIMIT = 300;
+    /** Countdown timer for the current sector */
     private Timer countdownTimer;
+    /** Remaining seconds for the current sector */
     private int secondsRemaining;
-    private boolean[] completedSectors; // Track which sectors are completed
-    private static boolean hasCompletedAllSectors = false; // 添加静态变量来记住完成状态
-    private JProgressBar bonus2Progress; // 添加 Bonus2 的进度条
+    /** Array to track which sectors are completed */
+    private boolean[] completedSectors;
+    /** Static flag to remember if all sectors are completed */
+    private static boolean hasCompletedAllSectors = false;
+    /** Progress bar for Bonus 2 */
+    private JProgressBar bonus2Progress;
 
-    // UI组件
-    private JPanel sectorSelectionPanel; // New panel for sector selection
-    private JPanel practicePanel; // Panel for practice interface
-    private JLabel promptLabel, attemptsLabel, progressLabel, timerLabel, feedbackLabel;
-    private JTextField areaField, perimeterField;
-    private WoodenButton submitButton, homeButton, nextButton;
+    // UI components
+    /** Panel for sector selection */
+    private JPanel sectorSelectionPanel;
+    /** Panel for practice interface */
+    private JPanel practicePanel;
+    /** Label for prompts */
+    private JLabel promptLabel;
+    /** Label for attempts */
+    private JLabel attemptsLabel;
+    /** Label for progress */
+    private JLabel progressLabel;
+    /** Label for timer */
+    private JLabel timerLabel;
+    /** Label for feedback */
+    private JLabel feedbackLabel;
+    /** Text field for area input */
+    private JTextField areaField;
+    /** Text field for perimeter input */
+    private JTextField perimeterField;
+    /** Button to submit answers */
+    private WoodenButton submitButton;
+    /** Button to return home */
+    private WoodenButton homeButton;
+    /** Button to proceed to next sector */
+    private WoodenButton nextButton;
+    /** Main panel for layout */
     private JPanel mainPanel;
+    /** Decimal formatter for results */
     private DecimalFormat df = new DecimalFormat("0.00");
 
-    private SectorDisplayPanel displayPanel; // 扇形图形显示面板
+    /** Display panel for the sector graphic */
+    private SectorDisplayPanel displayPanel;
 
+    /**
+     * Constructs a SectorPanel for Bonus 2.
+     * Initializes UI components, sector data, and sets up the layout.
+     *
+     * @param app The main application instance
+     */
     public SectorPanel(ShapevilleApp app) {
         this.mainApp = app;
         this.sectors = createSectors();
@@ -60,7 +104,11 @@ public class SectorPanel extends JPanel {
         createAndShowSectorSelection();
     }
 
-    // 创建8个扇形数据
+    /**
+     * Creates the list of sector data for the practice.
+     *
+     * @return List of SectorData objects
+     */
     private List<SectorData> createSectors() {
         List<SectorData> list = new ArrayList<>();
         list.add(new SectorData(8, 90, "cm"));
@@ -74,6 +122,9 @@ public class SectorPanel extends JPanel {
         return list;
     }
 
+    /**
+     * Creates and displays the sector selection panel.
+     */
     private void createAndShowSectorSelection() {
         removeAll();
         
@@ -144,6 +195,12 @@ public class SectorPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Creates a button panel for a specific sector.
+     *
+     * @param index The index of the sector
+     * @return JPanel representing the sector button
+     */
     private JPanel createSectorButton(int index) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(255, 250, 240));
@@ -194,6 +251,11 @@ public class SectorPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Starts the practice for the selected sector.
+     *
+     * @param index The index of the sector to practice
+     */
     private void startPractice(int index) {
         currentIndex = index;
         removeAll();
@@ -203,7 +265,11 @@ public class SectorPanel extends JPanel {
         displaySector(currentIndex);
     }
 
-    // 创建主界面
+    /**
+     * Creates the main practice panel for area and perimeter calculation.
+     *
+     * @return JPanel containing the practice interface
+     */
     private JPanel createMainPanel() {
         mainPanel = new JPanel(new BorderLayout(0, 0));
         mainPanel.setBackground(ColorConstants.BONUS_BG_COLOR);
@@ -331,7 +397,11 @@ public class SectorPanel extends JPanel {
         return mainPanel;
     }
 
-    // 显示第index个扇形
+    /**
+     * Displays the sector at the specified index and resets input fields.
+     *
+     * @param index The index of the sector to display
+     */
     private void displaySector(int index) {
         if (index >= TOTAL) {
             showCompletionPanel();
@@ -355,7 +425,9 @@ public class SectorPanel extends JPanel {
         startTimer();
     }
 
-    // 检查答案
+    /**
+     * Checks the user's answers for area and perimeter, provides feedback, and updates progress.
+     */
     private void checkAnswer() {
         String areaStr = areaField.getText().trim();
         String periStr = perimeterField.getText().trim();
@@ -421,7 +493,9 @@ public class SectorPanel extends JPanel {
         }
     }
 
-    // 下一个扇形
+    /**
+     * Proceeds to the next sector after completion or timeout.
+     */
     private void nextSector() {
         if (currentIndex >= 0) {
             completedSectors[currentIndex] = true;
@@ -432,7 +506,9 @@ public class SectorPanel extends JPanel {
         createAndShowSectorSelection();
     }
 
-    // 计时器
+    /**
+     * Starts the countdown timer for the current sector.
+     */
     private void startTimer() {
         secondsRemaining = TIME_LIMIT;
         if (countdownTimer != null) countdownTimer.stop();
@@ -454,7 +530,9 @@ public class SectorPanel extends JPanel {
         timerLabel.setForeground(Color.BLACK);
     }
 
-    // 时间到
+    /**
+     * Handles the event when time expires for the current sector.
+     */
     private void timeExpired() {
         if (countdownTimer != null) {
             countdownTimer.stop();
@@ -472,7 +550,9 @@ public class SectorPanel extends JPanel {
         nextButton.setEnabled(true);
     }
 
-    // 完成界面
+    /**
+     * Shows the completion panel when all sectors are finished.
+     */
     private void showCompletionPanel() {
         removeAll();
         JPanel panel = new JPanel(new BorderLayout());
@@ -494,6 +574,11 @@ public class SectorPanel extends JPanel {
         mainApp.addBonus2Progress();
     }
 
+    /**
+     * Shows a detailed solution for the current sector, including calculation steps.
+     *
+     * @param s The SectorData object for the current sector
+     */
     private void showDetailedSolution(SectorData s) {
         JTextArea solutionArea = new JTextArea();
         solutionArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
@@ -605,38 +690,95 @@ public class SectorPanel extends JPanel {
         }
     }
 
-    // 扇形数据类
+    /**
+     * Returns to the home screen and updates progress.
+     */
+    private void returnToHomeWithProgress() {
+        mainApp.returnToHome();
+    }
+
+    /**
+     * Checks if all sectors are completed.
+     *
+     * @return true if all sectors are completed, false otherwise
+     */
+    public boolean isAllSectorsCompleted() {
+        if (completedSectors == null) return hasCompletedAllSectors;
+        for (boolean completed : completedSectors) {
+            if (!completed) return false;
+        }
+        hasCompletedAllSectors = true; // 记住完成状态
+        return true;
+    }
+
+    /**
+     * Data class representing a sector with radius, angle, and unit.
+     */
     static class SectorData {
+        /** The radius of the sector */
         double radius;
+        /** The central angle of the sector in degrees */
         int angle;
+        /** The unit of measurement */
         String unit;
+
+        /**
+         * Constructs a SectorData object.
+         *
+         * @param r The radius
+         * @param a The angle in degrees
+         * @param u The unit
+         */
         public SectorData(double r, int a, String u) {
             this.radius = r;
             this.angle = a;
             this.unit = u;
         }
-        // Area calculation with PI = 3.14
+
+        /**
+         * Calculates the area of the sector (π = 3.14).
+         *
+         * @return The area of the sector
+         */
         public double getArea() {
             return angle / 360.0 * 3.14 * radius * radius;
         }
-        // Perimeter calculation with PI = 3.14
+
+        /**
+         * Calculates the perimeter of the sector (π = 3.14).
+         *
+         * @return The perimeter of the sector
+         */
         public double getPerimeter() {
             return angle / 360.0 * 2 * 3.14 * radius + 2 * radius;
         }
     }
 
     /**
-     * 内部类：用于绘制当前扇形图形
+     * Inner class for displaying the sector graphic.
      */
     class SectorDisplayPanel extends JPanel {
+        /** The radius of the sector */
         private double radius = 8;
+        /** The central angle of the sector in degrees */
         private int angle = 90;
+        /** The unit of measurement */
         private String unit = "cm";
-        
+
+        /**
+         * Constructs a SectorDisplayPanel with default values.
+         */
         public SectorDisplayPanel() {
             setOpaque(true);
         }
 
+        /**
+         * Sets the sector parameters and repaints the panel.
+         *
+         * @param r The radius
+         * @param a The angle in degrees
+         * @param u The unit
+         */
         public void setSector(double r, int a, String u) {
             this.radius = r;
             this.angle = a;
@@ -644,6 +786,11 @@ public class SectorPanel extends JPanel {
             repaint();
         }
 
+        /**
+         * Paints the sector graphic, including radius lines and labels.
+         *
+         * @param g The Graphics context
+         */
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -700,20 +847,5 @@ public class SectorPanel extends JPanel {
             int labelY = cy - (int) Math.round(labelRadius * Math.sin(midAngle));
             g2.drawString(angleText, labelX, labelY);
         }
-    }
-
-    // 添加一个新方法来处理返回主页
-    private void returnToHomeWithProgress() {
-        mainApp.returnToHome();
-    }
-
-    // 修改 isAllSectorsCompleted 方法
-    public boolean isAllSectorsCompleted() {
-        if (completedSectors == null) return hasCompletedAllSectors;
-        for (boolean completed : completedSectors) {
-            if (!completed) return false;
-        }
-        hasCompletedAllSectors = true; // 记住完成状态
-        return true;
     }
 } 

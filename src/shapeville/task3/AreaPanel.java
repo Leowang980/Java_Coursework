@@ -15,34 +15,90 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * A panel that handles the area calculation task in Shapeville.
+ * This panel provides an interactive interface for users to practice calculating
+ * areas of different geometric shapes including rectangles, parallelograms,
+ * triangles, and trapeziums.
+ *
+ * @author Shapeville Team
+ * @version 1.0
+ */
 public class AreaPanel extends JPanel {
+    /** The main application instance */
     private final ShapevilleApp mainApp;
+    
+    /** Layout manager for switching between different views */
     private final CardLayout cardLayout;
+    
+    /** Main content panel that holds all views */
     private final JPanel contentPanel;
 
+    /** Display component for geometric shapes */
     private ShapeAreaDisplay shapeDisplay;
+    
+    /** Input field for user's answer */
     private JTextField answerField;
+    
+    /** Button to submit the answer */
     private WoodenButton submitButton;
+    
+    /** Label to show feedback messages */
     private JLabel feedbackLabel;
+    
+    /** Label to show number of attempts */
     private JLabel attemptsLabel;
+    
+    /** Label to show remaining time */
     private JLabel timerLabel;
+    
+    /** Progress bar showing completion status */
     private JProgressBar progressBar;
 
+    /** List of available geometric shapes */
     private List<GeometricShape> shapes;
+    
+    /** Currently selected shape for practice */
     private GeometricShape currentShape;
+    
+    /** Number of attempts made for current shape */
     private int attempts = 0;
+    
+    /** Total number of completed shapes */
     private int totalCompleted = 0;
+    
+    /** Timer for countdown */
     private Timer countdownTimer;
+    
+    /** Remaining time in seconds */
     private int secondsRemaining;
+    
+    /** Flag to track if progress has been added */
     private boolean haveAddedProgress = true;
+    
+    /** Random number generator for shape parameters */
     private final Random random = new Random();
+    
+    /** Decimal formatter for area calculations */
     private final DecimalFormat df = new DecimalFormat("#.##");
+    
+    /** Panel for shape selection */
     private JPanel selectionPanel;
-    // 新增：跟踪每个形状的完成状态
+    
+    /** Array to track completion status of each shape */
     private boolean[] shapeCompleted = new boolean[4];
-    private JPanel[] shapePanels = new JPanel[4]; // Store panels instead of just buttons
+    
+    /** Array to store shape selection panels */
+    private JPanel[] shapePanels = new JPanel[4];
+    
+    /** Timer for updating progress display */
     private Timer updateTimer;
 
+    /**
+     * Constructs a new AreaPanel with the specified main application.
+     *
+     * @param mainApp The main Shapeville application instance
+     */
     public AreaPanel(ShapevilleApp mainApp) {
         this.mainApp = mainApp;
         this.cardLayout = new CardLayout();
@@ -71,6 +127,11 @@ public class AreaPanel extends JPanel {
                 .show(contentPanel, "SELECTION"); // 默认显示选择界面
     }
 
+    /**
+     * Creates the shape selection panel with buttons for each geometric shape.
+     *
+     * @return JPanel containing the shape selection interface
+     */
     private JPanel createSelectionPanel() {
         removeAll();
         JPanel panel = new JPanel(new BorderLayout(10, 10));
@@ -189,6 +250,12 @@ public class AreaPanel extends JPanel {
 
         return panel;
     }
+
+    /**
+     * Starts the practice session for the selected shape.
+     *
+     * @param shapeName The name of the selected shape
+     */
     private void startSelectedShape(String shapeName) {
         // 根据形状名称找到对应的 GeometricShape 对象
         currentShape = shapes.stream()
@@ -212,6 +279,10 @@ public class AreaPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Invalid shape selected!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    /**
+     * Initializes the list of available geometric shapes with their area calculation formulas.
+     */
     private void initializeShapes() {
         shapes = new ArrayList<>();
 
@@ -236,6 +307,11 @@ public class AreaPanel extends JPanel {
                 new String[]{"a", "b", "height"}));
     }
 
+    /**
+     * Creates the task panel where users can practice area calculations.
+     *
+     * @return JPanel containing the task interface
+     */
     private JPanel createTaskPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -342,6 +418,11 @@ public class AreaPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Creates the completion panel shown when all shapes are completed.
+     *
+     * @return JPanel containing the completion message and navigation buttons
+     */
     private JPanel createCompletionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -392,6 +473,9 @@ public class AreaPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Starts the countdown timer for the current task.
+     */
     private void startTimer() {
         secondsRemaining = 180; // 3 minutes
 
@@ -420,6 +504,9 @@ public class AreaPanel extends JPanel {
         timerLabel.setForeground(Color.BLACK);
     }
 
+    /**
+     * Handles the expiration of the countdown timer.
+     */
     private void timeExpired() {
         feedbackLabel.setText("Time's up! The correct answer is: " + df.format(currentShape.calculateArea()));
         feedbackLabel.setForeground(Color.RED);
@@ -443,6 +530,9 @@ public class AreaPanel extends JPanel {
 //        timer.start();
     }
 
+    /**
+     * Displays the next shape for practice.
+     */
     private void displayNextShape() {
         // 重置尝试次数
         attempts = 0;
@@ -465,6 +555,9 @@ public class AreaPanel extends JPanel {
         //mainApp.updateProgress(0); // 重置为0或保持当前进度
     }
 
+    /**
+     * Generates random parameters for the current shape.
+     */
     private void generateShapeParameters() {
         double[] parameters = new double[currentShape.getParameterNames().length];
 
@@ -476,6 +569,9 @@ public class AreaPanel extends JPanel {
         currentShape.setParameters(parameters);
     }
 
+    /**
+     * Checks the user's answer against the correct area calculation.
+     */
     private void checkAnswer() {
         String userAnswer = answerField.getText().trim();
 
@@ -612,7 +708,12 @@ public class AreaPanel extends JPanel {
         }
     }
 
-    // 新增：获取形状索引的辅助方法
+    /**
+     * Gets the index of a shape in the shapes array.
+     *
+     * @param shapeName The name of the shape to find
+     * @return The index of the shape, or -1 if not found
+     */
     private int getShapeIndex(String shapeName) {
         String[] shapeNames = {"rectangle", "parallelogram", "triangle", "trapezium"};
         for (int i = 0; i < shapeNames.length; i++) {
@@ -623,7 +724,9 @@ public class AreaPanel extends JPanel {
         return -1;
     }
 
-    // 新增：过滤已答过的题目
+    /**
+     * Filters out shapes that have already been answered.
+     */
     private void filterAnsweredShapes() {
         List<GeometricShape> unanswered = new ArrayList<>();
         for (GeometricShape shape : shapes) {
@@ -634,20 +737,38 @@ public class AreaPanel extends JPanel {
         shapes = unanswered;
     }
 
-    // Inner class to display geometric shapes with their parameters
+    /**
+     * Inner class for displaying geometric shapes with their parameters.
+     */
     private class ShapeAreaDisplay extends JPanel {
+        /** The current shape to display */
         private GeometricShape shape;
+        
+        /** Flag to control solution display */
         private boolean showSolution = false;
 
+        /**
+         * Constructs a new ShapeAreaDisplay.
+         */
         public ShapeAreaDisplay() {
             setBackground(Color.WHITE);
         }
 
+        /**
+         * Sets the shape to display.
+         *
+         * @param shape The geometric shape to display
+         */
         public void setShape(GeometricShape shape) {
             this.shape = shape;
             repaint();
         }
 
+        /**
+         * Sets whether to show the solution.
+         *
+         * @param showSolution True to show the solution, false otherwise
+         */
         public void setShowSolution(boolean showSolution) {
             this.showSolution = showSolution;
             repaint();
@@ -721,6 +842,14 @@ public class AreaPanel extends JPanel {
             }
         }
 
+        /**
+         * Draws a rectangle with its dimensions.
+         *
+         * @param g2d The graphics context
+         * @param centerX The x-coordinate of the center
+         * @param centerY The y-coordinate of the center
+         * @param parameters The rectangle's parameters
+         */
         private void drawRectangle(Graphics2D g2d, int centerX, int centerY, double[] parameters) {
             int length = (int) (parameters[0] * 10);
             int width = (int) (parameters[1] * 10);
@@ -750,6 +879,14 @@ public class AreaPanel extends JPanel {
             g2d.drawString("Width = " + parameters[1], x - 50, y + width / 2);
         }
 
+        /**
+         * Draws a parallelogram with its dimensions.
+         *
+         * @param g2d The graphics context
+         * @param centerX The x-coordinate of the center
+         * @param centerY The y-coordinate of the center
+         * @param parameters The parallelogram's parameters
+         */
         private void drawParallelogram(Graphics2D g2d, int centerX, int centerY, double[] parameters) {
             int base = (int) (parameters[0] * 10);
             int height = (int) (parameters[1] * 10);
@@ -788,6 +925,14 @@ public class AreaPanel extends JPanel {
             g2d.setStroke(new BasicStroke(2));
         }
 
+        /**
+         * Draws a triangle with its dimensions.
+         *
+         * @param g2d The graphics context
+         * @param centerX The x-coordinate of the center
+         * @param centerY The y-coordinate of the center
+         * @param parameters The triangle's parameters
+         */
         private void drawTriangle(Graphics2D g2d, int centerX, int centerY, double[] parameters) {
             int base = (int) (parameters[0] * 10);
             int height = (int) (parameters[1] * 10);
@@ -821,6 +966,14 @@ public class AreaPanel extends JPanel {
             g2d.fillOval(centerX - 3, y - height - 3, 6, 6);
         }
 
+        /**
+         * Draws a trapezium with its dimensions.
+         *
+         * @param g2d The graphics context
+         * @param centerX The x-coordinate of the center
+         * @param centerY The y-coordinate of the center
+         * @param parameters The trapezium's parameters
+         */
         private void drawTrapezium(Graphics2D g2d, int centerX, int centerY, double[] parameters) {
             int a = (int) (parameters[0] * 10); // Top side
             int b = (int) (parameters[1] * 10); // Bottom side
@@ -864,13 +1017,29 @@ public class AreaPanel extends JPanel {
         }
     }
 
-    // Inner class to represent a geometric shape
+    /**
+     * Represents a geometric shape with its area calculation formula.
+     */
     public static class GeometricShape {
+        /** The name of the shape */
         private final String name;
+        
+        /** The calculator for the shape's area */
         private AreaCalculator calculator;
+        
+        /** The names of the shape's parameters */
         private final String[] parameterNames;
+        
+        /** The current values of the shape's parameters */
         private double[] parameters;
 
+        /**
+         * Constructs a new GeometricShape.
+         *
+         * @param name The name of the shape
+         * @param calculator The area calculator for the shape
+         * @param parameterNames The names of the shape's parameters
+         */
         public GeometricShape(String name, AreaCalculator calculator, String[] parameterNames) {
             this.name = name;
             this.calculator = calculator;
@@ -878,32 +1047,65 @@ public class AreaPanel extends JPanel {
             this.parameters = new double[parameterNames.length];
         }
 
+        /**
+         * Gets the name of the shape.
+         *
+         * @return The shape's name
+         */
         public String getName() {
             return name;
         }
 
+        /**
+         * Gets the current parameter values.
+         *
+         * @return Array of parameter values
+         */
         public double[] getParameters() {
             return parameters;
         }
 
+        /**
+         * Sets the parameter values.
+         *
+         * @param parameters The new parameter values
+         */
         public void setParameters(double[] parameters) {
             if (parameters.length == this.parameterNames.length) {
                 this.parameters = parameters;
             }
         }
 
+        /**
+         * Gets the names of the shape's parameters.
+         *
+         * @return Array of parameter names
+         */
         public String[] getParameterNames() {
             return parameterNames;
         }
 
+        /**
+         * Calculates the area of the shape.
+         *
+         * @return The calculated area
+         */
         public double calculateArea() {
             return calculator.calculate(parameters);
         }
     }
 
-    // Functional interface for area calculation
+    /**
+     * Functional interface for calculating the area of a shape.
+     */
     @FunctionalInterface
     public interface AreaCalculator {
+        /**
+         * Calculates the area of a shape.
+         *
+         * @param parameters The parameters needed for the calculation
+         * @return The calculated area
+         */
         double calculate(double[] parameters);
     }
 }

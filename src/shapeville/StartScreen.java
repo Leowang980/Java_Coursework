@@ -9,29 +9,41 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * The start screen of the Shapeville application.
+ * This class creates an interactive start screen with animated elements,
+ * including a character that can be controlled, clouds, stars, and interactive buttons.
+ * The screen provides navigation to different stages of the application.
+ *
+ * @author Shapeville Team
+ * @version 1.0
+ */
 public class StartScreen extends JPanel implements KeyListener {
+    /** The main application instance */
     private ShapevilleApp app;
+    
+    /** Image resources */
     private Image littlePersonImage;
     private Image cloudImage;
     private Image lockImage;
     private Image bonusImage;
     private Image doorImage;
-    private Image doorOpenImage; // Added door open image
+    private Image doorOpenImage;
     
-    // Door state management
+    /** Door animation state management */
     private boolean isDoorOpening = false;
     private long doorOpenTime = 0;
     private final int DOOR_OPEN_DELAY = 1000; // 1 second delay
     
-    // Add Key Stage 1 navigation delay management
+    /** Key Stage 1 navigation delay management */
     private boolean keyStage1NavigationPending = false;
     private long keyStage1NavigationTime = 0;
     private final int KEY_STAGE1_NAVIGATION_DELAY = 5000; // 5 seconds delay
     
-    // Add navigation control flag
+    /** Navigation control flag */
     private boolean navigationTriggered = false;
     
-    // Little person properties - start on the ground
+    /** Character properties and physics */
     private int personX = 180;
     private int personY = 620;
     private int personWidth = 50;
@@ -39,43 +51,42 @@ public class StartScreen extends JPanel implements KeyListener {
     private boolean isJumping = false;
     private boolean isFalling = false;
     private int jumpCount = 0;
-    private int maxJumpCount = 2; // 允许二段跳
+    private int maxJumpCount = 2;
     private int jumpVelocity = -15;
     private int fallVelocity = 0;
     private int gravity = 1;
-    private int groundLevel = 620; // Starting ground level
+    private int groundLevel = 620;
     
-    // Button standing state
+    /** Button interaction states */
     private boolean standingOnStage1 = false;
     private boolean standingOnStage2 = false;
     
-    // Game areas
+    /** Interactive areas on screen */
     private Rectangle titleArea = new Rectangle(350, 320, 500, 120);
     private Rectangle keyStage2Area = new Rectangle(350, 500, 500, 70);
     private Rectangle keyStage1Area = new Rectangle(350, 600, 500, 70);
-    
-    // Bonus areas will be calculated in the constructor
     private Rectangle bonusButtonArea;
     private Rectangle bonusCaveArea;
     
-    // Hover states
+    /** Hover states for interactive elements */
     private boolean keyStage1Hover = false;
     private boolean keyStage2Hover = false;
     private boolean bonusButtonHover = false;
     
-    // Clouds
+    /** Animated elements */
     private ArrayList<FancyCloud> clouds = new ArrayList<>();
-    
-    // Stars
     private ArrayList<Star> stars = new ArrayList<>();
-    
-    // Animation timer
     private Timer animationTimer;
     
-    // Animation parameters
+    /** Title animation parameters */
     private float titlePulse = 0f;
     private float titlePulseDirection = 0.01f;
-    
+
+    /**
+     * Constructs a new StartScreen with the specified application instance.
+     *
+     * @param app The main Shapeville application instance
+     */
     public StartScreen(ShapevilleApp app) {
         this.app = app;
         setFocusable(true);
@@ -205,6 +216,10 @@ public class StartScreen extends JPanel implements KeyListener {
         animationTimer.start();
     }
     
+    /**
+     * Updates all animations and game states.
+     * This includes cloud movement, star twinkling, and character physics.
+     */
     private void updateAnimations() {
         // Update clouds
         for (FancyCloud cloud : clouds) {
@@ -332,6 +347,11 @@ public class StartScreen extends JPanel implements KeyListener {
         }
     }
     
+    /**
+     * Navigates to the main screen with the specified access level.
+     *
+     * @param accessLevel The access level to set (1 for Key Stage 1, 2 for Key Stage 2, 3 for Bonus)
+     */
     private void navigateToMainScreen(int accessLevel) {
         // Set the appropriate access level and navigate to main screen
         app.setAccessLevel(accessLevel);
@@ -396,6 +416,11 @@ public class StartScreen extends JPanel implements KeyListener {
         }
     }
     
+    /**
+     * Draws the mountain background with gradient effects.
+     *
+     * @param g2d The graphics context to draw with
+     */
     private void drawMountains(Graphics2D g2d) {
         // Create smoother mountains with gradients
         Color darkGreen = new Color(34, 139, 34);
@@ -430,6 +455,11 @@ public class StartScreen extends JPanel implements KeyListener {
         g2d.fill(mountain2);
     }
     
+    /**
+     * Draws the SHAPEVILLE title with decorative elements.
+     *
+     * @param g2d The graphics context to draw with
+     */
     private void drawShapevilleTitle(Graphics2D g2d) {
         // Draw title box matching exactly the reference image
         int x = titleArea.x;
@@ -508,7 +538,17 @@ public class StartScreen extends JPanel implements KeyListener {
         g2d.drawString(title, textX, textY);
     }
     
-    // Draw a leaf with rotation
+    /**
+     * Draws a decorative leaf with rotation.
+     *
+     * @param g2d The graphics context to draw with
+     * @param x The x-coordinate of the leaf
+     * @param y The y-coordinate of the leaf
+     * @param width The width of the leaf
+     * @param height The height of the leaf
+     * @param color The color of the leaf
+     * @param angle The rotation angle in degrees
+     */
     private void drawLeaf(Graphics2D g2d, int x, int y, int width, int height, Color color, int angle) {
         // Save the current transform
         AffineTransform oldTransform = g2d.getTransform();
@@ -530,6 +570,14 @@ public class StartScreen extends JPanel implements KeyListener {
         g2d.setTransform(oldTransform);
     }
     
+    /**
+     * Draws a Key Stage sign with hover effects.
+     *
+     * @param g2d The graphics context to draw with
+     * @param area The area to draw the sign in
+     * @param text The text to display on the sign
+     * @param isHighlighted Whether the sign should be highlighted
+     */
     private void drawKeyStageSign(Graphics2D g2d, Rectangle area, String text, boolean isHighlighted) {
         int x = area.x;
         int y = area.y;
@@ -578,6 +626,18 @@ public class StartScreen extends JPanel implements KeyListener {
         g2d.drawString(text, textX, textY);
     }
     
+    /**
+     * Draws a wooden sign with text and hover effects.
+     *
+     * @param g2d The graphics context to draw with
+     * @param x The x-coordinate of the sign
+     * @param y The y-coordinate of the sign
+     * @param width The width of the sign
+     * @param height The height of the sign
+     * @param text The text to display
+     * @param fontSize The size of the font
+     * @param isHovered Whether the sign is being hovered over
+     */
     private void drawWoodenSign(Graphics2D g2d, int x, int y, int width, int height, String text, int fontSize, boolean isHovered) {
         // Special styling for the Bonus Tasks sign in bottom right
         boolean isBonus = text.equals("Bonus Tasks") && x > 1000; // Position check to ensure it's the bonus in corner
@@ -637,6 +697,15 @@ public class StartScreen extends JPanel implements KeyListener {
         g2d.drawString(text, textX, textY);
     }
     
+    /**
+     * Draws a diamond shape.
+     *
+     * @param g2d The graphics context to draw with
+     * @param x The x-coordinate of the diamond
+     * @param y The y-coordinate of the diamond
+     * @param size The size of the diamond
+     * @param color The color of the diamond
+     */
     private void drawDiamond(Graphics2D g2d, int x, int y, int size, Color color) {
         // Draw solid diamond with exact color from reference
         g2d.setColor(color);
@@ -646,6 +715,15 @@ public class StartScreen extends JPanel implements KeyListener {
         g2d.fillPolygon(xPoints, yPoints, 4);
     }
     
+    /**
+     * Draws decorative blue triangles.
+     *
+     * @param g2d The graphics context to draw with
+     * @param x The x-coordinate of the triangle row
+     * @param y The y-coordinate of the triangle row
+     * @param width The width of the triangle row
+     * @param pointInward Whether the triangles should point inward
+     */
     private void drawBlueTriangles(Graphics2D g2d, int x, int y, int width, boolean pointInward) {
         // Draw blue triangles matching reference
         g2d.setColor(new Color(100, 200, 255));
@@ -668,6 +746,11 @@ public class StartScreen extends JPanel implements KeyListener {
         }
     }
     
+    /**
+     * Draws the bonus button and door with animation effects.
+     *
+     * @param g2d The graphics context to draw with
+     */
     private void drawBonusButton(Graphics2D g2d) {
         // Draw the door image - either closed or open depending on state
         if (isDoorOpening && doorOpenImage != null) {
@@ -711,7 +794,6 @@ public class StartScreen extends JPanel implements KeyListener {
         g2d.drawString(text, textX, textY);
     }
     
-    // Key listener methods
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
@@ -763,12 +845,26 @@ public class StartScreen extends JPanel implements KeyListener {
         // Not needed for this implementation
     }
     
-    // Inner class for clouds
+    /**
+     * Inner class representing an animated cloud.
+     */
     private class FancyCloud {
+        /** Cloud position and size */
         int x, y, width, height;
+        /** Cloud movement speed */
         float speed;
+        /** Cloud transparency */
         float alpha = 0.95f;
         
+        /**
+         * Constructs a new FancyCloud.
+         *
+         * @param x The initial x-coordinate
+         * @param y The initial y-coordinate
+         * @param width The width of the cloud
+         * @param height The height of the cloud
+         * @param speed The movement speed of the cloud
+         */
         public FancyCloud(int x, int y, int width, int height, float speed) {
             this.x = x;
             this.y = y;
@@ -777,6 +873,9 @@ public class StartScreen extends JPanel implements KeyListener {
             this.speed = speed;
         }
         
+        /**
+         * Updates the cloud's position.
+         */
         public void move() {
             x -= speed;
             if (x < -width) {
@@ -785,6 +884,11 @@ public class StartScreen extends JPanel implements KeyListener {
             }
         }
         
+        /**
+         * Draws the cloud.
+         *
+         * @param g2d The graphics context to draw with
+         */
         public void draw(Graphics2D g2d) {
             // Simple cloud shape matching reference
             g2d.setColor(Color.WHITE);
@@ -799,13 +903,27 @@ public class StartScreen extends JPanel implements KeyListener {
         }
     }
     
-    // Inner class for twinkling stars
+    /**
+     * Inner class representing a twinkling star.
+     */
     private class Star {
+        /** Star position and size */
         int x, y, size;
+        /** Star transparency */
         int alpha = 255;
+        /** Star fade speed */
         int fadeSpeed;
+        /** Whether the star is currently fading */
         boolean fading = true;
         
+        /**
+         * Constructs a new Star.
+         *
+         * @param x The x-coordinate of the star
+         * @param y The y-coordinate of the star
+         * @param size The size of the star
+         * @param fadeSpeed The speed at which the star fades in and out
+         */
         public Star(int x, int y, int size, int fadeSpeed) {
             this.x = x;
             this.y = y;
@@ -813,6 +931,9 @@ public class StartScreen extends JPanel implements KeyListener {
             this.fadeSpeed = fadeSpeed;
         }
         
+        /**
+         * Updates the star's twinkling effect.
+         */
         public void update() {
             if (fading) {
                 alpha -= fadeSpeed;
@@ -833,7 +954,7 @@ public class StartScreen extends JPanel implements KeyListener {
     }
     
     /**
-     * Reset navigation control when returning to start screen
+     * Resets the navigation state and character position when returning to the start screen.
      */
     public void resetNavigation() {
         // Reset navigation flag

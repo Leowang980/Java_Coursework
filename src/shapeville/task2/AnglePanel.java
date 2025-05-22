@@ -17,24 +17,48 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A panel for Task 2: Angle Types in the Shapeville application.
+ * <p>
+ * This panel allows users to input angles, visually identify and classify them
+ * as acute, right, obtuse, straight, or reflex. It provides interactive feedback,
+ * progress tracking, and integrates with the main application for score and navigation.
+ * </p>
+ */
 public class AnglePanel extends JPanel {
+    /** Reference to the main application instance */
     private final ShapevilleApp mainApp;
+    /** Layout manager for switching between different panels */
     private final CardLayout cardLayout;
+    /** Container panel for all content */
     private final JPanel contentPanel;
 
+    /** Display component for the angle visualization */
     private AngleDisplay angleDisplay;
+    /** Input field for entering the angle in degrees */
     private JTextField angleInputField;
+    /** Button to submit the angle value */
     private WoodenButton submitAngleButton;
+    /** Input field for entering the angle type */
     private JTextField answerField;
+    /** Button to submit the angle type answer */
     private WoodenButton submitAnswerButton;
+    /** Label to show feedback messages */
     private JLabel feedbackLabel;
+    /** Label to show number of attempts */
     private JLabel attemptsLabel;
+    /** Label to show progress */
     private JLabel progressLabel;
+    /** Label to show the current angle in degrees */
     private JLabel currentAngleLabel;
 
+    /** Set of identified angle types by the user */
     private Set<String> identifiedAngleTypes;
+    /** The current angle in degrees */
     private int currentAngleDegrees;
+    /** The current angle type (acute, right, obtuse, straight, reflex) */
     private String currentAngleType;
+    /** Number of attempts for the current angle */
     private int attempts = 0;
 
     public AnglePanel(ShapevilleApp mainApp) {

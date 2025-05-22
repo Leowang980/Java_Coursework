@@ -15,14 +15,31 @@ import java.awt.event.KeyEvent;
 import shapeville.utils.WoodenButton;
 import shapeville.utils.ColorConstants;
 
+/**
+ * The main application class for the Shapeville geometry learning game.
+ * This class manages the game's UI, navigation between different tasks,
+ * progress tracking, and scoring system.
+ *
+ * @author Shapeville Team
+ * @version 1.0
+ */
 public class ShapevilleApp extends JFrame {
+    /** Main content panel that holds all screens */
     private JPanel contentPanel;
+    
+    /** Layout manager for switching between different screens */
     private CardLayout cardLayout;
+    
+    /** Progress bar showing overall completion */
     private JProgressBar progressBar;
+    
+    /** Label displaying current score */
     private JLabel scoreLabel;
+    
+    /** Total score accumulated during the session */
     private int totalScore = 0;
     
-    // Constants for the different screens
+    /** Screen identifiers for navigation */
     public static final String START_SCREEN = "START";
     public static final String HOME_SCREEN = "HOME";
     public static final String SHAPE_2D_SCREEN = "SHAPE_2D";
@@ -33,30 +50,38 @@ public class ShapevilleApp extends JFrame {
     public static final String COMPOUND_SCREEN = "COMPOUND";
     public static final String SECTOR_SCREEN = "SECTOR";
     
-    // Task panels
+    /** Task panels for different learning modules */
     private StartScreen startScreen;
     private Shape2DPanel shape2DPanel;
     private Shape3DPanel shape3DPanel;
     private AnglePanel anglePanel;
     private AreaPanel areaPanel;
     private CirclePanel circlePanel;
-    private JPanel sectorPanel; // Bonus2 扇形练习面板
-    private JPanel compoundPanel; // Bonus1 扇形练习面板
+    private JPanel sectorPanel;
+    private JPanel compoundPanel;
+    
+    /** Total progress percentage */
     private double progress_total = 0.0;
-    // Task 1 2D/3D完成标志
+    
+    /** Completion flags for each task */
     private boolean task1_2dCompleted = false;
     private boolean task1_3dCompleted = false;
-    // 新增：Task2、3、4、Bonus1、Bonus2完成标志
     private boolean task2Completed = false;
     private boolean task3Completed = false;
     private boolean task4Completed = false;
     private boolean bonus1Completed = false;
     private boolean bonus2Completed = false;
-    private int totalProgress = 0; // 记录总进度百分比
-    private int accessLevel = 0; // 0=none, 1=Key Stage 1, 2=Key Stage 2, 3=All
-
-    // 只声明，不初始化
     
+    /** Total progress percentage as integer */
+    private int totalProgress = 0;
+    
+    /** Access level for different game stages (0=none, 1=Key Stage 1, 2=Key Stage 2, 3=All) */
+    private int accessLevel = 0;
+
+    /**
+     * Constructs a new ShapevilleApp instance.
+     * Initializes the UI, loads saved progress, and sets up the game environment.
+     */
     public ShapevilleApp() {
         setTitle("Shapeville - Learning Geometry");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -123,6 +148,11 @@ public class ShapevilleApp extends JFrame {
         scoreLabel.setText("Score: " + totalScore);
     }
     
+    /**
+     * Creates the home panel with task selection buttons and game information.
+     *
+     * @return JPanel containing the home screen interface
+     */
     private JPanel createHomePanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
@@ -193,6 +223,15 @@ public class ShapevilleApp extends JFrame {
         return panel;
     }
     
+    /**
+     * Adds a task button to the home panel with appropriate access control.
+     *
+     * @param panel The panel to add the button to
+     * @param title The button title
+     * @param description The task description
+     * @param action The action to perform when clicked
+     * @param requiredLevel The minimum access level required
+     */
     private void addTaskButton(JPanel panel, String title, String description, ActionListener action, int requiredLevel) {
         // 使用新的WoodenButton构造函数，分别传递标题和描述
         JButton button = new WoodenButton(title, description);
@@ -221,6 +260,11 @@ public class ShapevilleApp extends JFrame {
         panel.add(button);
     }
     
+    /**
+     * Creates the navigation panel with progress bar and control buttons.
+     *
+     * @return JPanel containing navigation controls
+     */
     private JPanel createNavigationPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -266,7 +310,9 @@ public class ShapevilleApp extends JFrame {
         return panel;
     }
     
-    // Methods to navigate between screens
+    /**
+     * Starts the home screen and initializes necessary components.
+     */
     public void startHomeScreen() {
         // Remove existing home panel if it exists
         for (Component comp : contentPanel.getComponents()) {
@@ -298,6 +344,12 @@ public class ShapevilleApp extends JFrame {
         homePanel.requestFocusInWindow();
     }
     
+    /**
+     * Finds a panel by its name in the content panel.
+     *
+     * @param name The name of the panel to find
+     * @return The found panel component, or null if not found
+     */
     private Component findPanelByName(String name) {
         // This method had issues - we don't need it anymore
         for (Component comp : contentPanel.getComponents()) {
@@ -308,6 +360,9 @@ public class ShapevilleApp extends JFrame {
         return null;
     }
     
+    /**
+     * Returns to the home screen.
+     */
     public void returnToHome() {
         // 直接显示home界面，不重新创建
         cardLayout.show(contentPanel, HOME_SCREEN);
@@ -329,6 +384,9 @@ public class ShapevilleApp extends JFrame {
         homePanel.requestFocusInWindow();
     }
     
+    /**
+     * Returns to the start screen and resets navigation.
+     */
     public void returnToStartScreen() {
         // 不再清除面板缓存
         /*
@@ -354,6 +412,9 @@ public class ShapevilleApp extends JFrame {
         startScreen.requestFocusInWindow();
     }
     
+    /**
+     * Ends the current session and displays final score.
+     */
     private void endSession() {
         JOptionPane.showMessageDialog(this, 
                 "You have achieved " + totalScore + " points in this session. Goodbye!", 
@@ -362,34 +423,44 @@ public class ShapevilleApp extends JFrame {
         System.exit(0);
     }
     
-    // Methods to start different tasks
-    
-    // Task 1: Shape Identification
+    /**
+     * Starts Task 1 (Shape Identification).
+     */
     public void startTask1() {
         // First part of Task 1 is 2D shape identification
         startTask1_2D();
     }
     
+    /**
+     * Starts the 2D shape identification part of Task 1.
+     */
     public void startTask1_2D() {
         // Initialize the 2D shapes panel if not already done
         // Show the 2D shapes screen
         cardLayout.show(contentPanel, SHAPE_2D_SCREEN);
     }
     
+    /**
+     * Starts the 3D shape identification part of Task 1.
+     */
     public void startTask1_3D() {
         // Initialize the 3D shapes panel if not already done
         // Show the 3D shapes screen
         cardLayout.show(contentPanel, SHAPE_3D_SCREEN);
     }
     
-    // Task 2: Angle Type Identification
+    /**
+     * Starts Task 2 (Angle Type Identification).
+     */
     public void startTask2() {
         // Initialize the angle panel if not already done 
         // Show the angle screen
         cardLayout.show(contentPanel, ANGLE_SCREEN);
     }
     
-    // Task 3: Area Calculation
+    /**
+     * Starts Task 3 (Area Calculation).
+     */
     public void startTask3() {
         // Initialize the area panel if not already done
         
@@ -397,14 +468,18 @@ public class ShapevilleApp extends JFrame {
         cardLayout.show(contentPanel, AREA_SCREEN);
     }
     
-    // Task 4: Circle Calculations
+    /**
+     * Starts Task 4 (Circle Calculations).
+     */
     public void startTask4() {
         // Initialize the circle panel if not already don 
         // Show the circle screen
         cardLayout.show(contentPanel, CIRCLE_SCREEN);
     }
 
-    // Bonus 1: Compound Shapes Area Calculation
+    /**
+     * Starts Bonus Task 1 (Compound Shapes).
+     */
     public void startBonus1() {
         // 初始化CompoundPanel，如果未创建则新建
 
@@ -412,19 +487,30 @@ public class ShapevilleApp extends JFrame {
         cardLayout.show(contentPanel, "COMPOUND_SCREEN");
     }
     
-    // Bonus 2: Sector Area and Arc Length Calculation
+    /**
+     * Starts Bonus Task 2 (Sector Area and Arc Length).
+     */
     public void startBonus2() {
         // 初始化SectorPanel，如果未创建则新建
         // 显示SectorPanel
         cardLayout.show(contentPanel, "SECTOR_SCREEN");
     }
     
-    // Methods to update UI elements
+    /**
+     * Updates the score display with new points.
+     *
+     * @param points The points to add to the total score
+     */
     public void updateScore(int points) {
         totalScore += points;
         scoreLabel.setText("Score: " + totalScore);
     }
     
+    /**
+     * Updates the progress bar with new progress.
+     *
+     * @param progress The progress increment to add
+     */
     public void updateProgress(double progress) {
         progress_total += progress;
         System.out.println("progress_total: " + progress_total);
@@ -433,6 +519,11 @@ public class ShapevilleApp extends JFrame {
         progressBar.setString(progressValue + "%");
     }
     
+    /**
+     * Main method to start the application.
+     *
+     * @param args Command line arguments (not used)
+     */
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -445,12 +536,20 @@ public class ShapevilleApp extends JFrame {
             app.setVisible(true);
         });
     }
+    
+    /**
+     * Gets the current score from the score manager.
+     *
+     * @return The current score
+     */
     public int getCurrentScore() {
         return ScoreManager.getScore();
     }
     
     /**
-     * Task1子模块完成时调用，part=0.5表示2D或3D各占一半
+     * Adds progress for Task 1's 2D or 3D part.
+     *
+     * @param part The progress part to add (0.5 for 2D or 3D)
      */
     public void addTask1ProgressPart(double part) {
         double increment = 100.0 / 6.0 * part; // 每个模块占16.67%
@@ -466,6 +565,9 @@ public class ShapevilleApp extends JFrame {
         }
     }
     
+    /**
+     * Adds progress for Task 1's 3D part.
+     */
     public void addTask1Progress3DPart() {
         double increment = 100.0 / 6.0 * 0.5; // 3D部分占总进度的8.33%
         if (!task1_3dCompleted) {
@@ -478,15 +580,27 @@ public class ShapevilleApp extends JFrame {
         }
     }
     
+    /**
+     * Checks if Task 1's 2D part is completed.
+     *
+     * @return true if completed, false otherwise
+     */
     public boolean isTask1_2dCompleted() { 
         return task1_2dCompleted || ScoreManager.isTask1_2dCompleted(); 
     }
     
+    /**
+     * Checks if Task 1's 3D part is completed.
+     *
+     * @return true if completed, false otherwise
+     */
     public boolean isTask1_3dCompleted() { 
         return task1_3dCompleted || ScoreManager.isTask1_3dCompleted();
     }
     
-    // 统一进度加分方法
+    /**
+     * Adds progress for Task 2 completion.
+     */
     public void addTask2Progress() {
         double increment = 100.0 / 6.0; // 每个模块占16.67%
         if (!task2Completed) {
@@ -499,6 +613,9 @@ public class ShapevilleApp extends JFrame {
         }
     }
     
+    /**
+     * Adds progress for Task 3 completion.
+     */
     public void addTask3Progress() {
         double increment = 100.0 / 6.0;
         if (!task3Completed) {
@@ -511,6 +628,9 @@ public class ShapevilleApp extends JFrame {
         }
     }
     
+    /**
+     * Adds progress for Task 4 completion.
+     */
     public void addTask4Progress() {
         double increment = 100.0 / 6.0;
         if (!task4Completed) {
@@ -523,6 +643,9 @@ public class ShapevilleApp extends JFrame {
         }
     }
     
+    /**
+     * Adds progress for Bonus Task 1 completion.
+     */
     public void addBonus1Progress() {
         double increment = 100.0 / 6.0;
         if (!bonus1Completed) {
@@ -535,6 +658,9 @@ public class ShapevilleApp extends JFrame {
         }
     }
     
+    /**
+     * Adds progress for Bonus Task 2 completion.
+     */
     public void addBonus2Progress() {
         double increment = 100.0 / 6.0;
         if (!bonus2Completed) {
@@ -547,27 +673,56 @@ public class ShapevilleApp extends JFrame {
         }
     }
     
+    /**
+     * Checks if Task 2 is completed.
+     *
+     * @return true if completed, false otherwise
+     */
     public boolean isTask2Completed() { 
         return task2Completed || ScoreManager.isTask2Completed(); 
     }
     
+    /**
+     * Checks if Task 3 is completed.
+     *
+     * @return true if completed, false otherwise
+     */
     public boolean isTask3Completed() { 
         return task3Completed || ScoreManager.isTask3Completed(); 
     }
     
+    /**
+     * Checks if Task 4 is completed.
+     *
+     * @return true if completed, false otherwise
+     */
     public boolean isTask4Completed() { 
         return task4Completed || ScoreManager.isTask4Completed(); 
     }
     
+    /**
+     * Checks if Bonus Task 1 is completed.
+     *
+     * @return true if completed, false otherwise
+     */
     public boolean isBonus1Completed() { 
         return bonus1Completed || ScoreManager.isBonus1Completed(); 
     }
     
+    /**
+     * Checks if Bonus Task 2 is completed.
+     *
+     * @return true if completed, false otherwise
+     */
     public boolean isBonus2Completed() { 
         return bonus2Completed || ScoreManager.isBonus2Completed(); 
     }
     
-    // Set access level based on start screen selection
+    /**
+     * Sets the access level for the game.
+     *
+     * @param level The access level to set (0=none, 1=Key Stage 1, 2=Key Stage 2, 3=All)
+     */
     public void setAccessLevel(int level) {
         this.accessLevel = level;
         System.out.println("Access level set to: " + level);

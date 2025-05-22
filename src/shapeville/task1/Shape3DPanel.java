@@ -13,26 +13,51 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A panel for Task 1: 3D Shape Identification in the Shapeville application.
+ * <p>
+ * This panel allows users to identify 3D shapes by name, provides interactive feedback,
+ * tracks progress and score, and integrates with the main application for navigation and persistence.
+ * </p>
+ */
 public class Shape3DPanel extends JPanel {
+    /** Reference to the main application instance */
     private final ShapevilleApp mainApp;
+    /** Layout manager for switching between different panels */
     private final CardLayout cardLayout;
+    /** Container panel for all content */
     private final JPanel contentPanel;
 
+    /** Label to display the shape image */
     private JLabel shapeImageLabel;
+    /** Input field for entering the shape name */
     private JTextField answerField;
+    /** Button to submit the answer */
     private WoodenButton submitButton;
+    /** Label to show feedback messages */
     private JLabel feedbackLabel;
+    /** Label to show number of attempts */
     private JLabel attemptsLabel;
+    /** Label to show progress */
     private JLabel progressLabel;
+    /** Label to show the module score */
     private JLabel moduleScoreLabel;
+    /** Progress bar for module progress */
     private JProgressBar moduleProgressBar;
+    /** Current module score */
     private int moduleScore = 0;
 
+    /** List of 3D shapes for the task */
     private List<Shape3D> shapes;
+    /** The current shape being displayed */
     private Shape3D currentShape;
+    /** Index of the current shape in the list */
     private int currentShapeIndex = 0;
+    /** Number of attempts for the current shape */
     private int attempts = 0;
+    /** Number of shapes completed */
     private int totalCompleted = 0;
+    /** Button to proceed to the next shape */
     private WoodenButton nextButton;
 
     public Shape3DPanel(ShapevilleApp mainApp) {
@@ -354,7 +379,7 @@ public class Shape3DPanel extends JPanel {
         // 无论对错都记录已答题
         if (!ScoreManager.isShape3DAnswered(currentShape.getName())) {
             ScoreManager.markShape3DAnswered(currentShape.getName());
-            totalCompleted = ScoreManager.getTask1_3dProgress();
+            //totalCompleted = ScoreManager.getTask1_3dProgress();
         }
     }
 

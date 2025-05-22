@@ -13,28 +13,58 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A panel for Task 1: 2D Shape Identification in the Shapeville application.
+ * <p>
+ * This panel allows users to identify 2D shapes by name, provides interactive feedback,
+ * tracks progress and score, and integrates with the main application for navigation and persistence.
+ * </p>
+ */
 public class Shape2DPanel extends JPanel {
+    /** Reference to the main application instance */
     private final ShapevilleApp mainApp;
+    /** Layout manager for switching between different panels */
     private final CardLayout cardLayout;
+    /** Container panel for all content */
     private final JPanel contentPanel;
 
+    /** Label to display the shape image */
     private JLabel shapeImageLabel;
+    /** Input field for entering the shape name */
     private JTextField answerField;
+    /** Button to submit the answer */
     private WoodenButton submitButton;
+    /** Label to show feedback messages */
     private JLabel feedbackLabel;
+    /** Label to show number of attempts */
     private JLabel attemptsLabel;
+    /** Label to show progress */
     private JLabel progressLabel;
+    /** Label to show the module score */
     private JLabel moduleScoreLabel;
+    /** Progress bar for module progress */
     private JProgressBar moduleProgressBar;
+    /** Current module score */
     private int moduleScore = 0;
 
+    /** List of 2D shapes for the task */
     private List<Shape2D> shapes;
+    /** The current shape being displayed */
     private Shape2D currentShape;
+    /** Number of attempts for the current shape */
     private int attempts = 0;
+    /** Number of shapes completed */
     private int totalCompleted = 0;
 
+    /** Button to proceed to the next shape */
     private WoodenButton nextButton;
 
+    /**
+     * Constructs a Shape2DPanel for Task 1.
+     * Initializes UI components, loads and shuffles shapes, and sets up the layout.
+     *
+     * @param mainApp The main application instance
+     */
     public Shape2DPanel(ShapevilleApp mainApp) {
         this.mainApp = mainApp;
         this.cardLayout = new CardLayout();
@@ -82,6 +112,9 @@ public class Shape2DPanel extends JPanel {
         updateProgressUI();
     }
 
+    /**
+     * Initializes the list of 2D shapes for the task.
+     */
     private void initializeShapes() {
         shapes = new ArrayList<>();
 
@@ -99,6 +132,11 @@ public class Shape2DPanel extends JPanel {
         shapes.add(new Shape2D("kite", "kite"));
     }
 
+    /**
+     * Creates the main task panel containing the shape image, input fields, and controls.
+     *
+     * @return JPanel containing the task interface
+     */
     private JPanel createTaskPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(ColorConstants.MAIN_BG_COLOR); // 使用木质风格的主背景色
@@ -224,6 +262,11 @@ public class Shape2DPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Creates the completion panel shown when all shapes are identified.
+     *
+     * @return JPanel containing the completion message and navigation buttons
+     */
     private JPanel createCompletionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(ColorConstants.SUCCESS_BG_COLOR); // 使用木质风格的成功背景色
@@ -262,6 +305,9 @@ public class Shape2DPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Displays the next shape in the list, updates progress, and resets input fields.
+     */
     private void displayNextShape() {
         nextButton.setEnabled(false);
         if (shapes.isEmpty()) {
@@ -304,6 +350,10 @@ public class Shape2DPanel extends JPanel {
         moduleProgressBar.setString(totalCompleted + "/11");
     }
 
+    /**
+     * Checks the user's answer for the current shape and provides feedback.
+     * Updates progress and handles correct/incorrect answers.
+     */
     private void checkAnswer() {
         String userAnswer = answerField.getText().trim().toLowerCase();
         String correctAnswer = currentShape.getName().toLowerCase();
@@ -383,6 +433,9 @@ public class Shape2DPanel extends JPanel {
         //nextButton.setEnabled(true);
     }       
 
+    /**
+     * Filters out shapes that have already been answered by the user.
+     */
     private void filterAnsweredShapes() {
         // Create a temporary list to hold unanswered shapes
         List<Shape2D> unansweredShapes = new ArrayList<>();
@@ -397,6 +450,9 @@ public class Shape2DPanel extends JPanel {
         shapes = unansweredShapes;
     }
     
+    /**
+     * Updates the progress and score displays in the UI.
+     */
     private void updateProgressUI() {
         // Update progress and score displays
         progressLabel.setText("Progress: " + totalCompleted + "/" + 11); // Total shapes is 11
@@ -405,20 +461,40 @@ public class Shape2DPanel extends JPanel {
         moduleProgressBar.setString(totalCompleted + "/11");
     }
 
-    // Inner class to represent a 2D shape
+    /**
+     * Inner class to represent a 2D shape with a name and image path.
+     */
     private static class Shape2D {
+        /** The name of the 2D shape */
         private final String name;
+        /** The image path for the 2D shape */
         private final String imagePath;
 
+        /**
+         * Constructs a Shape2D object.
+         *
+         * @param name      The name of the shape
+         * @param imagePath The image path for the shape
+         */
         public Shape2D(String name, String imagePath) {
             this.name = name;
             this.imagePath = imagePath;
         }
 
+        /**
+         * Gets the name of the shape.
+         *
+         * @return The shape name
+         */
         public String getName() {
             return name;
         }
 
+        /**
+         * Gets the image path for the shape.
+         *
+         * @return The image path
+         */
         public String getImagePath() {
             return imagePath;
         }

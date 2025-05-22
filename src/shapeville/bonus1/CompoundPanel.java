@@ -16,35 +16,77 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Bonus2 扇形面积与周长练习面板
- * Sector Area & Perimeter Practice Panel
+ * A panel for Bonus 1: Compound Shape Area Practice in the Shapeville application.
+ * <p>
+ * This panel allows users to practice calculating the area of compound shapes,
+ * provides interactive feedback, tracks progress and attempts, and integrates with the main application.
+ * </p>
  */
 public class CompoundPanel extends JPanel {
+    /** Reference to the main application instance */
     private final ShapevilleApp mainApp;
-    private final List<CompoundData> compounds; // 8个扇形数据
-    private int currentIndex = -1; // Changed to -1 to indicate no sector selected
+    /** List of compound shape data for the practice */
+    private final List<CompoundData> compounds;
+    /** Index of the current compound shape being practiced */
+    private int currentIndex = -1;
+    /** Number of attempts for the current compound shape */
     private int attempts = 0;
+    /** Number of completed compound shapes */
     private int completed = 0;
+    /** Total number of compound shapes */
     private static final int TOTAL = 6;
+    /** Maximum number of attempts allowed */
     private static final int MAX_ATTEMPTS = ScoreManager.MAX_ATTEMPTS;
-    private static final int TIME_LIMIT = 300; // 5分钟，单位秒
+    /** Time limit for each compound shape (in seconds) */
+    private static final int TIME_LIMIT = 300;
+    /** Countdown timer for the current compound shape */
     private Timer countdownTimer;
+    /** Remaining seconds for the current compound shape */
     private int secondsRemaining;
-    private boolean[] completedSectors; // Track which sectors are completed
-    private static boolean hasCompletedAllSectors = false; // 添加静态变量来记住完成状态
-    private JProgressBar bonus1Progress; // 添加 Bonus2 的进度条
+    /** Array to track which compound shapes are completed */
+    private boolean[] completedSectors;
+    /** Static flag to remember if all compound shapes are completed */
+    private static boolean hasCompletedAllSectors = false;
+    /** Progress bar for Bonus 1 */
+    private JProgressBar bonus1Progress;
 
-    // UI组件
-    private JPanel compoundSelectionPanel; // New panel for sector selection
-    //private JPanel practicePanel; // Panel for practice interface
-    private JLabel promptLabel, attemptsLabel, progressLabel, timerLabel, feedbackLabel;
-    private JTextField areaField, perimeterField;
-    private WoodenButton submitButton, homeButton, nextButton;
+    // UI components
+    /** Panel for compound shape selection */
+    private JPanel compoundSelectionPanel;
+    /** Label for prompts */
+    private JLabel promptLabel;
+    /** Label for attempts */
+    private JLabel attemptsLabel;
+    /** Label for progress */
+    private JLabel progressLabel;
+    /** Label for timer */
+    private JLabel timerLabel;
+    /** Label for feedback */
+    private JLabel feedbackLabel;
+    /** Text field for area input */
+    private JTextField areaField;
+    /** Text field for perimeter input */
+    private JTextField perimeterField;
+    /** Button to submit answers */
+    private WoodenButton submitButton;
+    /** Button to return home */
+    private WoodenButton homeButton;
+    /** Button to proceed to next compound shape */
+    private WoodenButton nextButton;
+    /** Main panel for layout */
     private JPanel mainPanel;
+    /** Decimal formatter for results */
     private DecimalFormat df = new DecimalFormat("0.00");
 
-    private CompoundDisplayPanel displayPanel; // 扇形图形显示面板
+    /** Display panel for the compound shape graphic */
+    private CompoundDisplayPanel displayPanel;
 
+    /**
+     * Constructs a CompoundPanel for Bonus 1.
+     * Initializes UI components, compound shape data, and sets up the layout.
+     *
+     * @param app The main application instance
+     */
     public CompoundPanel(ShapevilleApp app) {
         this.mainApp = app;
         this.compounds = createCompounds();
@@ -60,18 +102,25 @@ public class CompoundPanel extends JPanel {
         createAndShowCompoundSelection();
     }
 
-    // 创建8个扇形数据
+    /**
+     * Creates the list of compound shape data for the practice.
+     *
+     * @return List of CompoundData objects
+     */
     private List<CompoundData> createCompounds() {
         List<CompoundData> list = new ArrayList<>();
-        list.add(new CompoundData("./sourses/Compound1.jpg", "cm", 310.0));
-        list.add(new CompoundData("./sourses/Compound2.jpg", "cm", 598.0));
-        list.add(new CompoundData("./sourses/Compound3.jpg", "m", 288.0));
-        list.add(new CompoundData("./sourses/Compound4.jpg", "m", 18.0));
-        list.add(new CompoundData("./sourses/Compound5.jpg", "m", 3456.0));
-        list.add(new CompoundData("./sourses/Compound6.jpg", "m", 174.0));
+        list.add(new CompoundData("shapeville/images/bonus1/Compound1.jpg", "cm", 310.0));
+        list.add(new CompoundData("shapeville/images/bonus1/Compound2.jpg", "cm", 598.0));
+        list.add(new CompoundData("shapeville/images/bonus1/Compound3.jpg", "m", 288.0));
+        list.add(new CompoundData("shapeville/images/bonus1/Compound4.jpg", "m", 18.0));
+        list.add(new CompoundData("shapeville/images/bonus1/Compound5.jpg", "m", 3456.0));
+        list.add(new CompoundData("shapeville/images/bonus1/Compound6.jpg", "m", 174.0));
         return list;
     }
 
+    /**
+     * Creates and displays the compound shape selection panel.
+     */
     private void createAndShowCompoundSelection() {
         removeAll();
         
@@ -143,6 +192,13 @@ public class CompoundPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Creates a button panel for a specific compound shape.
+     *
+     * @param compound The compound shape data
+     * @param index The index of the compound shape
+     * @return JPanel representing the compound shape button
+     */
     private JPanel createCompoundButton(CompoundData compound, int index) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(255, 250, 240));
@@ -189,6 +245,11 @@ public class CompoundPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Starts the practice for the selected compound shape.
+     *
+     * @param index The index of the compound shape to practice
+     */
     private void startPractice(int index) {
         currentIndex = index;
         removeAll();
@@ -198,7 +259,11 @@ public class CompoundPanel extends JPanel {
         displayCompound(currentIndex);
     }
 
-    // 创建主界面
+    /**
+     * Creates the main practice panel for area calculation.
+     *
+     * @return JPanel containing the practice interface
+     */
     private JPanel createMainPanel() {
         mainPanel = new JPanel(new BorderLayout(0, 0));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -325,7 +390,11 @@ public class CompoundPanel extends JPanel {
         return mainPanel;
     }
 
-    // 显示第index个扇形
+    /**
+     * Displays the compound shape at the specified index and resets input fields.
+     *
+     * @param index The index of the compound shape to display
+     */
     private void displayCompound(int index) {
         if (index >= TOTAL) {
             showCompletionPanel();
@@ -346,7 +415,9 @@ public class CompoundPanel extends JPanel {
         startTimer();
     }
 
-    // 检查答案
+    /**
+     * Checks the user's answer for area, provides feedback, and updates progress.
+     */
     private void checkAnswer() {
         String areaStr = areaField.getText().trim();
 
@@ -416,7 +487,9 @@ public class CompoundPanel extends JPanel {
         }
     }
 
-    // 下一个扇形
+    /**
+     * Proceeds to the next compound shape after completion or timeout.
+     */
     private void nextSector() {
         if (currentIndex >= 0) {
             completedSectors[currentIndex] = true;
@@ -427,7 +500,9 @@ public class CompoundPanel extends JPanel {
         createAndShowCompoundSelection();
     }
 
-    // 计时器
+    /**
+     * Starts the countdown timer for the current compound shape.
+     */
     private void startTimer() {
         secondsRemaining = TIME_LIMIT;
         if (countdownTimer != null) countdownTimer.stop();
@@ -449,7 +524,9 @@ public class CompoundPanel extends JPanel {
         timerLabel.setForeground(Color.BLACK);
     }
 
-    // 时间到
+    /**
+     * Handles the event when time expires for the current compound shape.
+     */
     private void timeExpired() {
         if (countdownTimer != null) {
             countdownTimer.stop();
@@ -467,7 +544,9 @@ public class CompoundPanel extends JPanel {
         nextButton.setEnabled(true);
     }
 
-    // 完成界面
+    /**
+     * Shows the completion panel when all compound shapes are finished.
+     */
     private void showCompletionPanel() {
         removeAll();
         JPanel panel = new JPanel(new BorderLayout());
@@ -493,6 +572,11 @@ public class CompoundPanel extends JPanel {
         mainApp.addBonus1Progress();
     }
 
+    /**
+     * Shows a detailed solution for the current compound shape, including calculation steps.
+     *
+     * @param c The CompoundData object for the current compound shape
+     */
     private void showDetailedSolution(CompoundData c) {
         JTextArea solutionArea = new JTextArea();
         solutionArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
@@ -573,12 +657,49 @@ public class CompoundPanel extends JPanel {
         }
     }
 
-    // 扇形数据类
+    /**
+     * Returns to the home screen and updates progress.
+     */
+    private void returnToHomeWithProgress() {
+        
+        mainApp.returnToHome();
+    }
+
+    /**
+     * Checks if all compound shapes are completed.
+     *
+     * @return true if all compound shapes are completed, false otherwise
+     */
+    public boolean isAllCompoundsCompleted() {
+        if (completedSectors == null) return hasCompletedAllSectors;
+        for (boolean completed : completedSectors) {
+            if (!completed) return false;
+        }
+        hasCompletedAllSectors = true; // 记住完成状态
+        System.out.println("isAllCompoundsCompleted: " + hasCompletedAllSectors);
+        return true;
+    }
+
+    /**
+     * Data class representing a compound shape with image path, unit, and area.
+     */
     static class CompoundData {
+        /** The path to the compound shape image */
         String img_path;
+        /** The unit of measurement */
         String unit;
+        /** The area of the compound shape */
         double area;
+        /** The detailed solution steps */
         String answer;
+
+        /**
+         * Constructs a CompoundData object.
+         *
+         * @param img_path The path to the compound shape image
+         * @param unit The unit of measurement
+         * @param area The area of the compound shape
+         */
         public CompoundData(String img_path, String unit, double area) {
             this.img_path = img_path;
             this.unit = unit;
@@ -605,26 +726,53 @@ public class CompoundPanel extends JPanel {
     }
 
     /**
-     * 内部类：用于绘制当前扇形图形
+     * Inner class for displaying the compound shape graphic.
      */
     class CompoundDisplayPanel extends JPanel {
+        /** The path to the compound shape image */
         private String img_path;
+        /** The loaded image */
         private Image image;
         
+        /**
+         * Constructs a CompoundDisplayPanel.
+         */
         public CompoundDisplayPanel() {
             setOpaque(true);
         }
 
+        /**
+         * Sets the compound shape image and repaints the panel.
+         *
+         * @param img_path The path to the compound shape image
+         */
         public void setCompound(String img_path) {
             this.img_path = img_path;
-            // 加载图片
-            ImageIcon icon = new ImageIcon(img_path);
-            if (icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
-                image = icon.getImage();
+            // 使用 ClassLoader 加载图片资源
+            try {
+                java.net.URL imageUrl = getClass().getClassLoader().getResource(img_path);
+                if (imageUrl != null) {
+                    ImageIcon icon = new ImageIcon(imageUrl);
+                    if (icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
+                        image = icon.getImage();
+                    } else {
+                        System.err.println("Failed to load image: " + img_path);
+                    }
+                } else {
+                    System.err.println("Image not found: " + img_path);
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading image: " + img_path);
+                e.printStackTrace();
             }
             repaint();
         }
 
+        /**
+         * Paints the compound shape image, maintaining aspect ratio.
+         *
+         * @param g The Graphics context
+         */
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -656,22 +804,4 @@ public class CompoundPanel extends JPanel {
             }
         }
     }
-
-    // 添加一个新方法来处理返回主页
-    private void returnToHomeWithProgress() {
-        
-        mainApp.returnToHome();
-    }
-
-    // 修改 isAllSectorsCompleted 方法
-    public boolean isAllCompoundsCompleted() {
-        if (completedSectors == null) return hasCompletedAllSectors;
-        for (boolean completed : completedSectors) {
-            if (!completed) return false;
-        }
-        hasCompletedAllSectors = true; // 记住完成状态
-        System.out.println("isAllCompoundsCompleted: " + hasCompletedAllSectors);
-        return true;
-    }
-
 } 

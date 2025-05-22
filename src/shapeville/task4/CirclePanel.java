@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.Random;
-import java.awt.event.KeyEvent; // 新增此行
+import java.awt.event.KeyEvent;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -20,47 +20,92 @@ import java.util.ArrayList;
 import shapeville.utils.WoodenButton;
 import shapeville.utils.ColorConstants;
 
+/**
+ * A panel that implements the circle calculation task in Shapeville.
+ * This panel allows users to practice calculating circle area and circumference
+ * using either radius or diameter as input. It includes features such as:
+ * - Interactive circle visualization
+ * - Timer for each calculation
+ * - Progress tracking
+ * - Multiple calculation types (Area and Circumference)
+ * - Input validation and feedback
+ */
 public class CirclePanel extends JPanel {
+    /** Reference to the main application instance */
     private final ShapevilleApp mainApp;
+    /** Layout manager for switching between different panels */
     private final CardLayout cardLayout;
+    /** Container panel for all content */
     private final JPanel contentPanel;
 
+    /** Display component for the circle visualization */
     private CircleDisplay circleDisplay;
+    /** Input field for user's answer */
     private JTextField answerField;
+    /** Button to submit the answer */
     private WoodenButton submitButton;
+    /** Label to show feedback messages */
     private JLabel feedbackLabel;
+    /** Label to show number of attempts */
     private JLabel attemptsLabel;
+    /** Label to show progress */
     private JLabel progressLabel;
+    /** Label to show remaining time */
     private JLabel timerLabel;
 
-    private String currentCalculationType; // "Area" or "Circumference"
-    private String currentInputType; // "Radius" or "Diameter"
-    private double currentValue; // The radius or diameter value
+    /** Current calculation type: "Area" or "Circumference" */
+    private String currentCalculationType;
+    /** Current input type: "Radius" or "Diameter" */
+    private String currentInputType;
+    /** Current value (radius or diameter) */
+    private double currentValue;
+    /** Number of attempts for current calculation */
     private int attempts = 0;
+    /** Total number of calculations required */
     private int totalCalculations = 0;
+    /** Number of completed calculations */
     private int completedCalculations = 0;
+    /** Timer for countdown */
     private Timer countdownTimer;
-    private Timer nextStepTimer; // 统一管理所有定时器
+    /** Timer for managing next steps */
+    private Timer nextStepTimer;
+    /** Remaining seconds in current calculation */
     private int secondsRemaining;
-    private int totalTimeUsed = 0; // 新增成员变量
+    /** Total time used across all calculations */
+    private int totalTimeUsed = 0;
 
+    /** Random number generator for creating calculations */
     private final Random random = new Random();
+    /** Formatter for decimal numbers */
     private final DecimalFormat df = new DecimalFormat("#.#");
 
-    // Constants for calculations
+    /** Value of π used in calculations */
     private static final double PI = 3.14;
-    private static final int TOTAL_CALCULATIONS = 2; // 2 types *// 2 input methods * 2 times each
+    /** Total number of calculations required */
+    private static final int TOTAL_CALCULATIONS = 2;
 
-    //    private List<String> requiredInputTypes = new ArrayList<>();
+    /** Set to track completed calculation types */
     private Set<String> completedTypes = new HashSet<>();
-    // 新增组件
+    /** Panel for calculation type selection */
     private JPanel selectionPanel;
+    /** Group for calculation type radio buttons */
     private ButtonGroup calculationTypeGroup;
+    /** Radio button for area calculations */
     private JRadioButton areaRadioButton;
+    /** Radio button for circumference calculations */
     private JRadioButton circumferenceRadioButton;
 
+    /** Flag indicating if the last answer was correct */
     private boolean lastAnswerCorrect = false;
-    private String nextCalculationType;// 控制下一个计算类型
+    /** Next calculation type to be displayed */
+    private String nextCalculationType;
+
+    /**
+     * Constructs a new CirclePanel with the specified main application reference.
+     * Initializes the UI components and sets up the initial state.
+     *
+     * @param mainApp The main application instance
+     */
     public CirclePanel(ShapevilleApp mainApp) {
         this.mainApp = mainApp;
         this.cardLayout = new CardLayout();
@@ -96,6 +141,17 @@ public class CirclePanel extends JPanel {
 //        requiredInputTypes = new ArrayList<>();
     }
 
+    /**
+     * Creates the main task panel containing the circle display and input controls.
+     * This panel includes:
+     * - Title section
+     * - Circle visualization
+     * - Formula reference
+     * - Input field and submit button
+     * - Feedback and progress display
+     *
+     * @return JPanel containing the task interface
+     */
     private JPanel createTaskPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -211,6 +267,12 @@ public class CirclePanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Creates the formula reference panel showing area and circumference formulas.
+     * Displays both radius-based and diameter-based formulas for each calculation type.
+     *
+     * @return JPanel containing the formula reference
+     */
     private JPanel createFormulaPanel() {
         JPanel panel = new JPanel(new GridLayout(1, 2, 10, 10));
         panel.setBorder(BorderFactory.createTitledBorder("Circle Formulas"));
@@ -250,6 +312,12 @@ public class CirclePanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Creates the completion panel shown when all calculations are finished.
+     * Includes a success message and a button to return to the home screen.
+     *
+     * @return JPanel containing the completion message and return button
+     */
     private JPanel createCompletionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -354,6 +422,15 @@ public class CirclePanel extends JPanel {
         timer.start();
     }
 
+    /**
+     * Generates the next calculation and updates the display.
+     * Handles:
+     * - Random selection of input type (radius/diameter)
+     * - Value generation
+     * - Display updates
+     * - Timer management
+     * - Progress tracking
+     */
     private void generateNextCalculation() {
         // 在生成新题目前重置界面
         circleDisplay.setShowSolution(false);
@@ -392,6 +469,13 @@ public class CirclePanel extends JPanel {
         startTimer();
     }
 
+    /**
+     * Creates the selection panel for choosing calculation type.
+     * Provides buttons for:
+     * - Area calculations
+     * - Circumference calculations
+     * Each option includes visual styling and formula preview.
+     */
     private void createSelectionPanel() {
         selectionPanel = new JPanel(new BorderLayout(10, 10));
         selectionPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -519,6 +603,12 @@ public class CirclePanel extends JPanel {
         selectionPanel.add(centerPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Calculates the correct answer for the current calculation.
+     * Handles both area and circumference calculations using either radius or diameter.
+     *
+     * @return double The correct answer
+     */
     private double calculateCorrectAnswer() {
         if (currentCalculationType.equals("Area")) {
             if (currentInputType.equals("Radius")) {
@@ -536,6 +626,15 @@ public class CirclePanel extends JPanel {
         }
     }
 
+    /**
+     * Checks the user's answer against the correct answer.
+     * Provides feedback and updates the progress accordingly.
+     * Handles both correct and incorrect answers, including:
+     * - Input validation
+     * - Attempt counting
+     * - Score calculation
+     * - Progress updates
+     */
     private void checkAnswer() {
         // 输入验证（保留原有逻辑）
         String userAnswer = answerField.getText().trim();
@@ -672,18 +771,36 @@ public class CirclePanel extends JPanel {
         }
     }
 
-    // Inner class for drawing the circle and displaying calculation information
+    /**
+     * Inner class for displaying the circle and calculation information.
+     * Handles the visual representation of the circle and related measurements.
+     */
     private class CircleDisplay extends JPanel {
+        /** Current calculation type */
         private String calculationType;
+        /** Current input type */
         private String inputType;
+        /** Current value */
         private double value;
+        /** Flag indicating whether to show the solution */
         private boolean showSolution = false;
 
+        /**
+         * Constructs a new CircleDisplay panel.
+         * Initializes the display with default settings.
+         */
         public CircleDisplay() {
             setBackground(Color.WHITE);
             setPreferredSize(new Dimension(400, 300)); // 明确设置尺寸
         }
 
+        /**
+         * Sets the circle information for display.
+         *
+         * @param calculationType The type of calculation (Area/Circumference)
+         * @param inputType The type of input (Radius/Diameter)
+         * @param value The input value
+         */
         public void setCircleInfo(String calculationType, String inputType, double value) {
             this.calculationType = calculationType;
             this.inputType = inputType;
@@ -692,26 +809,26 @@ public class CirclePanel extends JPanel {
             repaint(); // 触发重绘
         }
 
+        /**
+         * Sets whether to show the solution on the circle display.
+         * @param showSolution true to show the solution, false to hide it
+         */
         public void setShowSolution(boolean showSolution) {
             this.showSolution = showSolution;
             repaint();
         }
 
-        public String getFormulaText() {
-            if (calculationType == null || inputType == null) {
-                return "";
-            }
-            if (calculationType.equals("Area")) {
-                return inputType.equals("Radius") ?
-                        "A = π × r²" :
-                        "A = π × (d/2)²";
-            } else {
-                return inputType.equals("Radius") ?
-                        "C = 2 × π × r" :
-                        "C = π × d";
-            }
-        }
-
+        /**
+         * Paints the circle and related information.
+         * Includes:
+         * - Circle drawing
+         * - Measurement lines
+         * - Labels
+         * - Formula display
+         * - Solution display (when enabled)
+         *
+         * @param g The Graphics context
+         */
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
