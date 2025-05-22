@@ -58,8 +58,7 @@ public class Shape2DPanel extends JPanel {
         contentPanel.add(taskPanel, "TASK");
 
         // Create completion panel
-        JPanel completionPanel = createCompletionPanel();
-        contentPanel.add(completionPanel, "COMPLETION");
+        
 
         // Add the content panel to this panel
         add(contentPanel, BorderLayout.CENTER);
@@ -267,6 +266,8 @@ public class Shape2DPanel extends JPanel {
         nextButton.setEnabled(false);
         if (shapes.isEmpty()) {
             // All shapes have been answered, show completion panel
+            JPanel completionPanel = createCompletionPanel();
+            contentPanel.add(completionPanel, "COMPLETION");
             cardLayout.show(contentPanel, "COMPLETION");
             return;
         }
@@ -321,7 +322,7 @@ public class Shape2DPanel extends JPanel {
             int score = ScoreManager.calculateScore(false, attempts); // Basic level
             moduleScore += score; // Add to module score
             ScoreManager.addToTask1_2dScore(score); // Persist module score
-            
+            System.out.println("2D Module Score: " + ScoreManager.getTask1_2dScore());
             String feedback = ScoreManager.getFeedbackMessage(score);
             feedbackLabel.setText("Correct! " + feedback + " +" + score + " points");
             feedbackLabel.setForeground(new Color(0, 128, 0)); // Dark green
@@ -334,6 +335,7 @@ public class Shape2DPanel extends JPanel {
             totalCompleted = ScoreManager.getTask1_2dProgress();
 
             // Disable input fields
+            nextButton.setEnabled(true);
             answerField.setEnabled(false);
             submitButton.setEnabled(false);
 
@@ -344,7 +346,8 @@ public class Shape2DPanel extends JPanel {
             if (shapes.isEmpty() || totalCompleted >= 11) { // 11 is the total number of shapes
                 // Mark task as completed
                 mainApp.addTask1ProgressPart(0.5);
-                
+                JPanel completionPanel = createCompletionPanel();
+                contentPanel.add(completionPanel, "COMPLETION");
                 // Show completion panel
                 cardLayout.show(contentPanel, "COMPLETION");
             }
@@ -356,6 +359,7 @@ public class Shape2DPanel extends JPanel {
             // If max attempts reached, show correct answer
             if (attempts >= ScoreManager.MAX_ATTEMPTS) {
                 feedbackLabel.setText("The correct answer is: " + correctAnswer);
+                nextButton.setEnabled(true);
                 answerField.setEnabled(false);
                 submitButton.setEnabled(false);
 
@@ -367,6 +371,8 @@ public class Shape2DPanel extends JPanel {
                 // 检查是否全部完成
                 if (shapes.isEmpty() || totalCompleted >= 11) {
                     mainApp.addTask1ProgressPart(0.5);
+                    JPanel completionPanel = createCompletionPanel();
+                    contentPanel.add(completionPanel, "COMPLETION");
                     cardLayout.show(contentPanel, "COMPLETION");
                 }
             }
@@ -374,8 +380,8 @@ public class Shape2DPanel extends JPanel {
 
         // Update the module score label
         moduleScoreLabel.setText("Module Score: " + moduleScore);
-        nextButton.setEnabled(true);
-    }
+        //nextButton.setEnabled(true);
+    }       
 
     private void filterAnsweredShapes() {
         // Create a temporary list to hold unanswered shapes

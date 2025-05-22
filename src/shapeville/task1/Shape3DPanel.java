@@ -33,6 +33,7 @@ public class Shape3DPanel extends JPanel {
     private int currentShapeIndex = 0;
     private int attempts = 0;
     private int totalCompleted = 0;
+    private WoodenButton nextButton;
 
     public Shape3DPanel(ShapevilleApp mainApp) {
         this.mainApp = mainApp;
@@ -56,8 +57,7 @@ public class Shape3DPanel extends JPanel {
         contentPanel.add(taskPanel, "TASK");
 
         // Create completion panel
-        JPanel completionPanel = createCompletionPanel();
-        contentPanel.add(completionPanel, "COMPLETION");
+        
 
         // Add the content panel to this panel
         add(contentPanel, BorderLayout.CENTER);
@@ -185,7 +185,7 @@ public class Shape3DPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(panel.getBackground());
 
-        WoodenButton nextButton = new WoodenButton("Next Shape");
+        nextButton = new WoodenButton("Next Shape");
         nextButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextButton.addActionListener(new ActionListener() {
             @Override
@@ -213,7 +213,9 @@ public class Shape3DPanel extends JPanel {
         
         // 新增：显示2D、3D和总分
         int score2d = ScoreManager.getTask1_2dScore();
+        System.out.println("2D Module Score: " + score2d);
         int score3d = ScoreManager.getTask1_3dScore();
+        System.out.println("3D Module Score: " + score3d);
         int total = score2d + score3d;
         String html = "<html>Congratulations! You've completed the 3D Shapes Identification task!<br>" +
                 "2D Module Score: <b>" + score2d + "</b><br>" +
@@ -261,11 +263,13 @@ public class Shape3DPanel extends JPanel {
         feedbackLabel.setText(" ");
         answerField.setText("");
         answerField.requestFocus();
-
+        nextButton.setEnabled(false);
         // Check if we've gone through all shapes
         if (currentShapeIndex >= shapes.size()) {
             // 只在全部完成时加分
             mainApp.addTask1Progress3DPart();
+            JPanel completionPanel = createCompletionPanel();
+            contentPanel.add(completionPanel, "COMPLETION");
             cardLayout.show(contentPanel, "COMPLETION");
             return;
         }
@@ -328,10 +332,11 @@ public class Shape3DPanel extends JPanel {
             moduleScoreLabel.setText("Module Score: " + moduleScore);
             // 持久化3D分数
             ScoreManager.addToTask1_3dScore(score);
-
+            System.out.println("3D Module Score: " + ScoreManager.getTask1_3dScore());
             // Disable input fields
             answerField.setEnabled(false);
             submitButton.setEnabled(false);
+            nextButton.setEnabled(true);
         } else {
             // Wrong answer
             feedbackLabel.setText("That's not correct. Try again!");
@@ -343,6 +348,7 @@ public class Shape3DPanel extends JPanel {
                 // Disable input fields
                 answerField.setEnabled(false);
                 submitButton.setEnabled(false);
+                nextButton.setEnabled(true);
             }
         }
         // 无论对错都记录已答题

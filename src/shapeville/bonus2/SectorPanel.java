@@ -716,18 +716,4 @@ public class SectorPanel extends JPanel {
         hasCompletedAllSectors = true; // 记住完成状态
         return true;
     }
-
-    // 添加一个公共方法供外部调用来更新进度
-    public void updateMainProgressIfCompleted() {
-        if (isAllSectorsCompleted()) {
-            mainApp.updateProgress(100.0/6);
-        }
-    }
-
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-        // 当面板被移除时（比如切换到其他面板时），检查并更新进度
-        updateMainProgressIfCompleted();
-    }
 } 

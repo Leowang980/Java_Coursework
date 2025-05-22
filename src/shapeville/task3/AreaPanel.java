@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +37,11 @@ public class AreaPanel extends JPanel {
     private boolean haveAddedProgress = true;
     private final Random random = new Random();
     private final DecimalFormat df = new DecimalFormat("#.##");
-    
+    private JPanel selectionPanel;
     // 新增：跟踪每个形状的完成状态
     private boolean[] shapeCompleted = new boolean[4];
     private JPanel[] shapePanels = new JPanel[4]; // Store panels instead of just buttons
+    private Timer updateTimer;
 
     public AreaPanel(ShapevilleApp mainApp) {
         this.mainApp = mainApp;
@@ -52,7 +54,7 @@ public class AreaPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // 添加选择界面
-        JPanel selectionPanel = createSelectionPanel();
+        selectionPanel = createSelectionPanel();
         contentPanel
                 .add(selectionPanel, "SELECTION");
 
@@ -70,6 +72,7 @@ public class AreaPanel extends JPanel {
     }
 
     private JPanel createSelectionPanel() {
+        removeAll();
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         panel.setBackground(ColorConstants.MAIN_BG_COLOR);
@@ -97,6 +100,26 @@ public class AreaPanel extends JPanel {
         progressBar.setStringPainted(true);
         progressBar.setString(progressBar.getValue() + "%");
         progressPanel.add(progressBar, BorderLayout.CENTER);
+
+        // 添加更新进度的监听器
+        if (updateTimer != null) {
+            updateTimer.stop();
+        }
+        updateTimer = new Timer(100, e -> {
+            progressLabel.setText(String.format("Completed: %d/4", totalCompleted));
+            progressBar.setValue((int)((totalCompleted * 100.0) / 4));
+            progressBar.setString(progressBar.getValue() + "%");
+        });
+        updateTimer.start();
+
+        // 添加面板销毁时的清理
+        panel.addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0) {
+                if (!panel.isDisplayable() && updateTimer != null) {
+                    updateTimer.stop();
+                }
+            }
+        });
 
         // 形状按钮面板（2x2网格布局）
         JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 15, 15));
@@ -127,8 +150,8 @@ public class AreaPanel extends JPanel {
             contentPanel.add(shapeTitleLabel);
             
             // Add "Done" label for completed shapes
-            JLabel doneLabel = new JLabel("Done");
-            doneLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+            JLabel doneLabel = new JLabel("✓ Done");
+            doneLabel.setFont(new Font("Serif", Font.BOLD, 16));
             doneLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             doneLabel.setForeground(Color.GRAY);
             doneLabel.setVisible(shapeCompleted[i]);
@@ -303,11 +326,11 @@ public class AreaPanel extends JPanel {
                 mainApp.updateProgress(100.0/6);
                 cardLayout.show(contentPanel, "COMPLETION");
             } else {
-            shapeDisplay.setShowSolution(false);
-            displayNextShape();
-            answerField.setEnabled(true);
-            submitButton.setEnabled(true);
-            cardLayout.show(contentPanel, "SELECTION"); // Return to selection screen
+                shapeDisplay.setShowSolution(false);
+                displayNextShape();
+                answerField.setEnabled(true);
+                submitButton.setEnabled(true);
+                cardLayout.show(contentPanel, "SELECTION"); // Return to selection screen
             }       
         });
 
@@ -494,7 +517,7 @@ public class AreaPanel extends JPanel {
 
             // 记录已答
             ScoreManager.markTask3Answered(currentShape.getName());
-            totalCompleted = ScoreManager.getTask3Progress();
+            //totalCompleted = ScoreManager.getTask3Progress();
 
             // 更新完成状态
             int shapeIndex = getShapeIndex(currentShape.getName());
@@ -506,18 +529,29 @@ public class AreaPanel extends JPanel {
                 progressBar.setValue((int)((totalCompleted * 100.0) / 4));
                 progressBar.setString(progressBar.getValue() + "%");
                 
-                // 检查是否全部完成
-                /*if (totalCompleted == 4) {
-                    cardLayout.show(contentPanel, "COMPLETION");
-                }*/
+                // 更新按钮状态
+                JPanel shapePanel = shapePanels[shapeIndex];
+                JButton button = (JButton) shapePanel.getComponent(0);
+                button.setEnabled(false);
+                button.setBackground(new Color(220, 220, 220));
+                
+                // 显示完成标签
+                JPanel contentPanel = (JPanel) button.getComponent(0);
+                JLabel shapeTitleLabel = (JLabel) contentPanel.getComponent(1);
+                shapeTitleLabel.setForeground(Color.GRAY);
+                
+                // 强制重绘面板
+                shapePanel.revalidate();
+                shapePanel.repaint();
             }
 
             // Disable input until next shape
+            System.out.println("disable input");
             answerField.setEnabled(false);
             submitButton.setEnabled(false);
-
+            ScoreManager.markTask3Answered(currentShape.getName());
             // 返回选择界面
-            answerField.setEnabled(true);
+            answerField.setEnabled(false);
         } else {
             // Wrong answer
             feedbackLabel.setText("That's not correct. Try again!");
@@ -540,7 +574,7 @@ public class AreaPanel extends JPanel {
 
                 // 记录已答
                 ScoreManager.markTask3Answered(currentShape.getName());
-                totalCompleted = ScoreManager.getTask3Progress();
+                //totalCompleted = ScoreManager.getTask3Progress();
 
                 // 更新完成状态
                 int shapeIndex = getShapeIndex(currentShape.getName());
@@ -552,13 +586,28 @@ public class AreaPanel extends JPanel {
                     progressBar.setValue((int)((totalCompleted * 100.0) / 4));
                     progressBar.setString(progressBar.getValue() + "%");
                     
-                    // 检查是否全部完成
-                    /*if (totalCompleted == 4) {
-                        cardLayout.show(contentPanel, "COMPLETION");
-                    }*/
+                    // 更新按钮状态
+                    JPanel shapePanel = shapePanels[shapeIndex];
+                    JButton button = (JButton) shapePanel.getComponent(0);
+                    button.setEnabled(false);
+                    button.setBackground(new Color(220, 220, 220));
+                    
+                    
+                    // 显示完成标签
+                    JPanel contentPanel = (JPanel) button.getComponent(0);
+                    JLabel shapeTitleLabel = (JLabel) contentPanel.getComponent(1);
+                    shapeTitleLabel.setForeground(Color.GRAY);
+                    
+                    JLabel doneLabel = (JLabel) contentPanel.getComponent(2);
+                    doneLabel.setVisible(true);
+                    doneLabel.setForeground(Color.GRAY);
+                    doneLabel.setText("Done");
+                    doneLabel.setFont(new Font("Serif", Font.BOLD, 16));
                 }
                 shapeDisplay.setShowSolution(false);
                 answerField.setEnabled(true);
+                ScoreManager.markTask3Answered(currentShape.getName());
+
             }
         }
     }

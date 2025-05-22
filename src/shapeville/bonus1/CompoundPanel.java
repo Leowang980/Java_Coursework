@@ -130,7 +130,8 @@ public class CompoundPanel extends JPanel {
         // If all sectors are completed, show return to home button
         if (allCompleted) {
             homeButton = new WoodenButton("Return to Home");
-            mainApp.updateProgress(100.0/6);
+            homeButton.addActionListener(e -> mainApp.returnToHome());
+            //mainApp.updateProgress(100.0/6);
             JPanel buttonPanel = new JPanel();
             buttonPanel.setBackground(panel.getBackground());
             buttonPanel.add(homeButton);
@@ -389,6 +390,9 @@ public class CompoundPanel extends JPanel {
             submitButton.setEnabled(false);
             nextButton.setEnabled(true);
             showDetailedSolution(c);
+            if (isAllCompoundsCompleted()) {
+                mainApp.updateProgress(100.0/6);
+            }
         } else {
             feedbackLabel.setText("Wrong, try again!");
             feedbackLabel.setForeground(Color.RED);
@@ -405,6 +409,9 @@ public class CompoundPanel extends JPanel {
                 showDetailedSolution(c);
                 submitButton.setEnabled(false);
                 nextButton.setEnabled(true);
+            }
+            if (isAllCompoundsCompleted()) {
+                mainApp.updateProgress(100.0/6);
             }
         }
     }
@@ -667,17 +674,4 @@ public class CompoundPanel extends JPanel {
         return true;
     }
 
-    // 添加一个公共方法供外部调用来更新进度
-    public void updateMainProgressIfCompleted() {
-        if (isAllCompoundsCompleted()) {
-            mainApp.updateProgress(100.0/6);
-        }
-    }
-
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-        // 当面板被移除时（比如切换到其他面板时），检查并更新进度
-        updateMainProgressIfCompleted();
-    }
 } 

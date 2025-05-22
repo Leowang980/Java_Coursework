@@ -54,6 +54,8 @@ public class ShapevilleApp extends JFrame {
     private boolean bonus2Completed = false;
     private int totalProgress = 0; // 记录总进度百分比
     private int accessLevel = 0; // 0=none, 1=Key Stage 1, 2=Key Stage 2, 3=All
+
+    // 只声明，不初始化
     
     public ShapevilleApp() {
         setTitle("Shapeville - Learning Geometry");
@@ -94,14 +96,11 @@ public class ShapevilleApp extends JFrame {
         // Create start screen
         startScreen = new StartScreen(this);
         
-        // Create panels for different screens
-        JPanel homePanel = createHomePanel();
-        
-        // Create task panels (we will initialize them lazily to improve startup time)
+        // 初始化homePanel
         
         // Add panels to the card layout
         contentPanel.add(startScreen, START_SCREEN);
-        contentPanel.add(homePanel, HOME_SCREEN);
+        //contentPanel.add(homePanel, HOME_SCREEN);
         
         // Add the main content panel
         add(contentPanel, BorderLayout.CENTER);
@@ -149,7 +148,20 @@ public class ShapevilleApp extends JFrame {
         addTaskButton(centerPanel, "Task 4: Circle Calculations", "Calculate area and circumference", e -> startTask4(), 2);
         addTaskButton(centerPanel, "Bonus 1: Compound Shapes", "Calculate areas of compound shapes", e -> startBonus1(), 3);
         addTaskButton(centerPanel, "Bonus 2: Sector & Arc", "Calculate sector area and arc length", e -> startBonus2(), 3);
-        
+        shape2DPanel = new Shape2DPanel(this);
+        contentPanel.add(shape2DPanel, SHAPE_2D_SCREEN);
+        shape3DPanel = new Shape3DPanel(this);
+        contentPanel.add(shape3DPanel, SHAPE_3D_SCREEN);
+        anglePanel = new AnglePanel(this);
+        contentPanel.add(anglePanel, ANGLE_SCREEN);
+        areaPanel = new AreaPanel(this);
+        contentPanel.add(areaPanel, AREA_SCREEN);
+        circlePanel = new CirclePanel(this);
+        contentPanel.add(circlePanel, CIRCLE_SCREEN);
+        compoundPanel = new shapeville.bonus1.CompoundPanel(this);
+        contentPanel.add(compoundPanel, "COMPOUND_SCREEN");
+        sectorPanel = new shapeville.bonus2.SectorPanel(this);
+        contentPanel.add(sectorPanel, "SECTOR_SCREEN");
         panel.add(centerPanel, BorderLayout.CENTER);
         
         // Game info panel
@@ -197,12 +209,12 @@ public class ShapevilleApp extends JFrame {
                 lockIcon = new ImageIcon(scaledImage);
                 
                 button.setIcon(lockIcon);
-                button.setEnabled(false);
+                button.setEnabled(true);
                 button.setDisabledIcon(lockIcon);
             } catch (Exception e) {
                 // If lock icon cannot be loaded, just use text
                 ((WoodenButton)button).setDescription(description + " (🔒 Locked)");
-                button.setEnabled(false);
+                button.setEnabled(true);
             }
         }
         
@@ -297,20 +309,29 @@ public class ShapevilleApp extends JFrame {
     }
     
     public void returnToHome() {
-        // Clear cached panels to fix re-entry bug
-        shape2DPanel = null;
-        shape3DPanel = null;
-        anglePanel = null;
-        areaPanel = null;
-        circlePanel = null;
-        sectorPanel = null;
-        compoundPanel = null;
+        // 直接显示home界面，不重新创建
+        cardLayout.show(contentPanel, HOME_SCREEN);
         
-        startHomeScreen();
+        // 显示导航面板
+        getContentPane().getComponent(1).setVisible(true);
+        
+        // 添加键盘监听器
+        Component homePanel = contentPanel.getComponent(1);
+        homePanel.setFocusable(true);
+        homePanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    returnToStartScreen();
+                }
+            }
+        });
+        homePanel.requestFocusInWindow();
     }
     
     public void returnToStartScreen() {
-        // Clear cached panels to fix re-entry bug
+        // 不再清除面板缓存
+        /*
         shape2DPanel = null;
         shape3DPanel = null;
         anglePanel = null;
@@ -318,17 +339,18 @@ public class ShapevilleApp extends JFrame {
         circlePanel = null;
         sectorPanel = null;
         compoundPanel = null;
+        */
         
-        // Hide navigation panel
+        // 隐藏导航面板
         getContentPane().getComponent(1).setVisible(false);
         
-        // Show start screen
+        // 显示开始界面
         cardLayout.show(contentPanel, START_SCREEN);
         
-        // Reset navigation controls in StartScreen
+        // 重置开始界面的导航控制
         startScreen.resetNavigation();
         
-        // Request focus for the start screen to capture key events
+        // 请求开始界面的焦点以捕获键盘事件
         startScreen.requestFocusInWindow();
     }
     
@@ -350,32 +372,19 @@ public class ShapevilleApp extends JFrame {
     
     public void startTask1_2D() {
         // Initialize the 2D shapes panel if not already done
-        if (shape2DPanel == null) {
-            shape2DPanel = new Shape2DPanel(this);
-            contentPanel.add(shape2DPanel, SHAPE_2D_SCREEN);
-        }
         // Show the 2D shapes screen
         cardLayout.show(contentPanel, SHAPE_2D_SCREEN);
     }
     
     public void startTask1_3D() {
         // Initialize the 3D shapes panel if not already done
-        if (shape3DPanel == null) {
-            shape3DPanel = new Shape3DPanel(this);
-            contentPanel.add(shape3DPanel, SHAPE_3D_SCREEN);
-        }
         // Show the 3D shapes screen
         cardLayout.show(contentPanel, SHAPE_3D_SCREEN);
     }
     
     // Task 2: Angle Type Identification
     public void startTask2() {
-        // Initialize the angle panel if not already done
-        if (anglePanel == null) {
-            anglePanel = new AnglePanel(this);
-            contentPanel.add(anglePanel, ANGLE_SCREEN);
-        }
-        
+        // Initialize the angle panel if not already done 
         // Show the angle screen
         cardLayout.show(contentPanel, ANGLE_SCREEN);
     }
@@ -383,10 +392,6 @@ public class ShapevilleApp extends JFrame {
     // Task 3: Area Calculation
     public void startTask3() {
         // Initialize the area panel if not already done
-        if (areaPanel == null) {
-            areaPanel = new AreaPanel(this);
-            contentPanel.add(areaPanel, AREA_SCREEN);
-        }
         
         // Show the area screen
         cardLayout.show(contentPanel, AREA_SCREEN);
@@ -394,12 +399,7 @@ public class ShapevilleApp extends JFrame {
     
     // Task 4: Circle Calculations
     public void startTask4() {
-        // Initialize the circle panel if not already done
-        if (circlePanel == null) {
-            circlePanel = new CirclePanel(this);
-            contentPanel.add(circlePanel, CIRCLE_SCREEN);
-        }
-        
+        // Initialize the circle panel if not already don 
         // Show the circle screen
         cardLayout.show(contentPanel, CIRCLE_SCREEN);
     }
@@ -407,10 +407,7 @@ public class ShapevilleApp extends JFrame {
     // Bonus 1: Compound Shapes Area Calculation
     public void startBonus1() {
         // 初始化CompoundPanel，如果未创建则新建
-        if (compoundPanel == null) {
-            compoundPanel = new shapeville.bonus1.CompoundPanel(this);
-            contentPanel.add(compoundPanel, "COMPOUND_SCREEN");
-        }
+
         // 显示CompoundPanel
         cardLayout.show(contentPanel, "COMPOUND_SCREEN");
     }
@@ -418,10 +415,6 @@ public class ShapevilleApp extends JFrame {
     // Bonus 2: Sector Area and Arc Length Calculation
     public void startBonus2() {
         // 初始化SectorPanel，如果未创建则新建
-        if (sectorPanel == null) {
-            sectorPanel = new shapeville.bonus2.SectorPanel(this);
-            contentPanel.add(sectorPanel, "SECTOR_SCREEN");
-        }
         // 显示SectorPanel
         cardLayout.show(contentPanel, "SECTOR_SCREEN");
     }
